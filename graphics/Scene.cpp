@@ -21,14 +21,20 @@ Scene::Scene(RenderingEngine* renderer) : renderer(renderer) {
 	//Create a single triangle
 	//Additional triangles can be created by pushing groups of three more vertices into the verts vector
 	Geometry triangle;
-	triangle.verts.push_back(glm::vec3(-0.6f, -0.4f, 1.0f));
-	triangle.verts.push_back(glm::vec3(0.0f, 0.6f, 1.0f));
-	triangle.verts.push_back(glm::vec3(0.6f, -0.4f, 1.0f));
+	triangle.vertices.push_back(glm::vec3(-1.0f, -1.0f, 1.0f));
+	triangle.vertices.push_back(glm::vec3(1.0f, -1.0f, 1.0f));
+	triangle.vertices.push_back(glm::vec3(1.0f, 1.0f, 1.0f));
+	triangle.vertices.push_back(glm::vec3(1.0f, 1.0f, 1.0f));
+	triangle.vertices.push_back(glm::vec3(-1.0f, 1.0f, 1.0f));
+	triangle.vertices.push_back(glm::vec3(-1.0f, -1.0f, 1.0f));
 
 	//Colors are stored per vertex in the order of the vertices
-	triangle.colors.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
-	triangle.colors.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-	triangle.colors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+	triangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
+	triangle.uvs.push_back(glm::vec2(1.0f, 0.0f));
+	triangle.uvs.push_back(glm::vec2(1.0f, 1.0f));
+	triangle.uvs.push_back(glm::vec2(1.0f, 1.0f));
+	triangle.uvs.push_back(glm::vec2(0.0f, 1.0f));
+	triangle.uvs.push_back(glm::vec2(0.0f, 0.0f));
 
 	triangle.drawMode = GL_TRIANGLES;
 

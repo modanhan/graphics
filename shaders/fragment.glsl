@@ -6,14 +6,11 @@
 // ==========================================================================
 #version 410
 
-// interpolated colour received from vertex stage
-in vec3 Colour;
+in vec3 UV;
 
-// first output is mapped to the framebuffer's colour index by default
 out vec4 FragmentColour;
 
 void main(void)
 {
-    // write colour output without modification
-    FragmentColour = vec4(Colour, 0);
+    FragmentColour = vec4(UV, 0);
 }

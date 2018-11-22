@@ -23,9 +23,8 @@ public:
 	virtual ~Geometry();
 
 	//Data structures for storing vertices, normals colors and uvs
-	std::vector<glm::vec3> verts;
+	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
-	std::vector<glm::vec3> colors;
 	std::vector<glm::vec2> uvs;
 
 	//Pointers to the vao and vbos associated with the geometry
@@ -33,7 +32,6 @@ public:
 	GLuint vertexBuffer;
 	GLuint normalBuffer;
 	GLuint uvBuffer;
-	GLuint colorBuffer;
 
 	//Draw mode for how OpenGL interprets primitives
 	GLuint drawMode;

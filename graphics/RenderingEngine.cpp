@@ -35,7 +35,7 @@ void RenderingEngine::RenderScene(const std::vector<Geometry>& objects) {
 
 	for (const Geometry& g : objects) {
 		glBindVertexArray(g.vao);
-		glDrawArrays(g.drawMode, 0, g.verts.size());
+		glDrawArrays(g.drawMode, 0, g.vertices.size());
 
 		// reset state to default (no shader or geometry bound)
 		glBindVertexArray(0);
@@ -65,16 +65,10 @@ void RenderingEngine::assignBuffers(Geometry& geometry) {
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(2);*/
 
-	glGenBuffers(1, &geometry.colorBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, geometry.colorBuffer);
-	//Parameters in order: Index of vbo in the vao, number of primitives per element, primitive type, etc.
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glEnableVertexAttribArray(1);
-
-	/*glGenBuffers(1, &geometry.uvBuffer);
+	glGenBuffers(1, &geometry.uvBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, geometry.uvBuffer);
-	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glEnableVertexAttribArray(3);*/
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(1);
 
 
 }
@@ -83,22 +77,18 @@ void RenderingEngine::setBufferData(Geometry& geometry) {
 	//Send geometry to the GPU
 	//Must be called whenever anything is updated about the object
 	glBindBuffer(GL_ARRAY_BUFFER, geometry.vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * geometry.verts.size(), geometry.verts.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * geometry.vertices.size(), geometry.vertices.data(), GL_STATIC_DRAW);
 
 	/*glBindBuffer(GL_ARRAY_BUFFER, geometry.normalBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * geometry.normals.size(), geometry.normals.data(), GL_STATIC_DRAW);*/
 
-	glBindBuffer(GL_ARRAY_BUFFER, geometry.colorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * geometry.colors.size(), geometry.colors.data(), GL_STATIC_DRAW);
-
-	/*glBindBuffer(GL_ARRAY_BUFFER, geometry.uvBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * geometry.uvs.size(), geometry.uvs.data(), GL_STATIC_DRAW);*/
+	glBindBuffer(GL_ARRAY_BUFFER, geometry.uvBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * geometry.uvs.size(), geometry.uvs.data(), GL_STATIC_DRAW);
 }
 
 void RenderingEngine::deleteBufferData(Geometry& geometry) {
 	glDeleteBuffers(1, &geometry.vertexBuffer);
 	glDeleteBuffers(1, &geometry.normalBuffer);
-	glDeleteBuffers(1, &geometry.colorBuffer);
 	glDeleteBuffers(1, &geometry.uvBuffer);
 	glDeleteVertexArrays(1, &geometry.vao);
 }
