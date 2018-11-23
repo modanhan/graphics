@@ -6,7 +6,7 @@ Texture::~Texture()
 	glDeleteTextures(1, &texture);
 }
 
-std::unique_ptr<Texture> Texture::Create(GLsizei width, GLsizei height, const std::vector<uint8_t> &image) {
+std::unique_ptr<Texture> Texture::CreateRGBA(GLsizei width, GLsizei height, const void* data) {
 	auto texture = std::unique_ptr<Texture>(new Texture());
 
 	glGenTextures(1, &texture->texture);
@@ -15,7 +15,7 @@ std::unique_ptr<Texture> Texture::Create(GLsizei width, GLsizei height, const st
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	// return nullptr if glGetError
 	return std::move(texture);

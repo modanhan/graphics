@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\middleware\glad\src\glad.c" />
+    <ClCompile Include="GraphicProgram.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ShaderTools.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="VertexArray.cpp" />
+    <ClCompile Include="Geometry.cpp">
+      <Filter>ray-tracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>ray-tracing</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GraphicProgram.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="VertexArray.h" />
+    <ClInclude Include="ShaderTools.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Geometry.h">
+      <Filter>ray-tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>ray-tracing</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ray-tracing">
+      <UniqueIdentifier>{072aa1e7-037a-4341-b4b0-1b1d1abee3c1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="graphics.rc" />
+  </ItemGroup>
+</Project>

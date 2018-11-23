@@ -15,7 +15,7 @@ std::unique_ptr<Window> Window::Create(int width, int height) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	window->window = glfwCreateWindow(width, height, "CPSC 453 OpenGL Boilerplate", 0, 0);
+	window->window = glfwCreateWindow(width, height, "Graphics", 0, 0);
 	if (!window->window) {
 		std::cout << "Program failed to create GLFW window, TERMINATING" << std::endl;
 		glfwTerminate();

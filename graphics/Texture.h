@@ -13,7 +13,7 @@ public:
 
 	~Texture();
 
-	static std::unique_ptr<Texture> Create(GLsizei width, GLsizei height, const std::vector<uint8_t> &image);
+	static std::unique_ptr<Texture> CreateRGBA(GLsizei width, GLsizei height, const void* data);
 	int activate(int target);
 };
 

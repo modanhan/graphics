@@ -20,10 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{8516B0C0-F488-4F9A-AFCB-5C7CBDBA3983}</ProjectGuid>
-    <RootNamespace>RefactoredBoilerplate</RootNamespace>
+    <ProjectGuid>{543A7D0E-3224-40E8-ABC3-941FF274A934}</ProjectGuid>
+    <RootNamespace>raytracing</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
-    <ProjectName>graphics</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -77,12 +76,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\middleware\glfw\include;$(ProjectDir)..\middleware\glad\include;$(ProjectDir)..\middleware\glm-0.9.8.2;$(ProjectDir)..\middleware;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\middleware\glfw\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -121,26 +115,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\middleware\glad\src\glad.c" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Geometry.cpp" />
-    <ClCompile Include="GraphicProgram.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="ShaderTools.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="VertexArray.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Geometry.h" />
-    <ClInclude Include="GraphicProgram.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="VertexArray.h" />
-    <ClInclude Include="ShaderTools.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="graphics.rc" />
+    <ProjectReference Include="..\graphics\graphics.vcxproj">
+      <Project>{8516b0c0-f488-4f9a-afcb-5c7cbdba3983}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
