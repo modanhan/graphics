@@ -122,22 +122,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\middleware\glad\src\glad.c" />
-    <ClCompile Include="Geometry.cpp" />
+    <ClCompile Include="GraphicProgram.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Program.cpp" />
-    <ClCompile Include="RenderingEngine.cpp" />
-    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShaderTools.cpp" />
     <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="window.cpp" />
+    <ClCompile Include="VertexArray.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Geometry.h" />
+    <ClInclude Include="GraphicProgram.h" />
     <ClInclude Include="Texture.h" />
-    <ClInclude Include="window.h" />
-    <ClInclude Include="Program.h" />
-    <ClInclude Include="RenderingEngine.h" />
-    <ClInclude Include="Scene.h" />
+    <ClInclude Include="VertexArray.h" />
     <ClInclude Include="ShaderTools.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
