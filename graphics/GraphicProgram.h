@@ -9,7 +9,7 @@ class Window {
 	GLFWwindow* window = nullptr;
 	Window() = default;
 public:
-	static std::unique_ptr<Window> Create();
+	static std::unique_ptr<Window> Create(int width, int height);
 
 	bool shouldClose();
 	int swap();

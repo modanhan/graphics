@@ -4,7 +4,7 @@
 // Author:  Sonny Chan, University of Calgary
 // Date:    December 2015
 // ==========================================================================
-#version 410
+#version 430
 
 layout(location = 0) in vec2 VertexPosition;
 layout(location = 1) in vec2 VertexUV;

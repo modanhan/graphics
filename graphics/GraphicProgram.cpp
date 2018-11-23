@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-std::unique_ptr<Window> Window::Create() {
+std::unique_ptr<Window> Window::Create(int width, int height) {
 	auto window = std::unique_ptr<Window>(new Window());
 	if (!glfwInit()) {
 		std::cout << "ERROR: GLFW failed to initialize, TERMINATING" << std::endl;
@@ -12,10 +12,10 @@ std::unique_ptr<Window> Window::Create() {
 
 	//Attempt to create a window with an OpenGL 4.1 core profile context
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	window->window = glfwCreateWindow(1280, 720, "CPSC 453 OpenGL Boilerplate", 0, 0);
+	window->window = glfwCreateWindow(width, height, "CPSC 453 OpenGL Boilerplate", 0, 0);
 	if (!window->window) {
 		std::cout << "Program failed to create GLFW window, TERMINATING" << std::endl;
 		glfwTerminate();
