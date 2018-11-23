@@ -6,11 +6,13 @@
 // ==========================================================================
 #version 410
 
-in vec3 UV;
+in vec2 UV;
 
 out vec4 FragmentColour;
 
+uniform sampler2D ColourTexture;
+
 void main(void)
 {
-    FragmentColour = vec4(UV, 0);
+    FragmentColour = texture(ColourTexture, UV);
 }

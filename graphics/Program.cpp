@@ -16,6 +16,7 @@
 
 #include "RenderingEngine.h"
 #include "Scene.h"
+#include "window.h"
 
 Program::Program() {
 	setupWindow();
@@ -30,7 +31,13 @@ Program::~Program() {
 void Program::start() {
 	renderingEngine = new RenderingEngine();
 	scene = new Scene(renderingEngine);
-
+	{
+		std::vector<uint8_t> image(window::width * window::height * 4, 255);
+		for (unsigned int i = 0; i < image.size(); i += 4) {
+			image[i] = i;
+		}
+		window::texture = Texture::Create(window::width, window::height, image);
+	}
 	//Main render loop
 	while (!glfwWindowShouldClose(window)) {
 		scene->displayScene();
@@ -56,9 +63,7 @@ void Program::setupWindow() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	int width = 512;
-	int height = 512;
-	window = glfwCreateWindow(width, height, "CPSC 453 OpenGL Boilerplate", 0, 0);
+	window = glfwCreateWindow(window::width, window::height, "CPSC 453 OpenGL Boilerplate", 0, 0);
 	if (!window) {
 		std::cout << "Program failed to create GLFW window, TERMINATING" << std::endl;
 		glfwTerminate();

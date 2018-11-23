@@ -128,9 +128,13 @@
     <ClCompile Include="RenderingEngine.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShaderTools.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Geometry.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="window.h" />
     <ClInclude Include="Program.h" />
     <ClInclude Include="RenderingEngine.h" />
     <ClInclude Include="Scene.h" />

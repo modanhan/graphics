@@ -8,6 +8,7 @@
 #include "RenderingEngine.h"
 
 #include <iostream>
+#include "window.h"
 
 //included here because it just contains some global functions
 #include "ShaderTools.h"
@@ -35,6 +36,7 @@ void RenderingEngine::RenderScene(const std::vector<Geometry>& objects) {
 
 	for (const Geometry& g : objects) {
 		glBindVertexArray(g.vao);
+		window::texture->activate(0);
 		glDrawArrays(g.drawMode, 0, g.vertices.size());
 
 		// reset state to default (no shader or geometry bound)

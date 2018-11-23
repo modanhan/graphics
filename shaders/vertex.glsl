@@ -7,9 +7,9 @@
 #version 410
 
 layout(location = 0) in vec2 VertexPosition;
-layout(location = 1) in vec3 VertexUV;
+layout(location = 1) in vec2 VertexUV;
 
-out vec3 UV;
+out vec2 UV;
 
 void main()
 {
