@@ -35,16 +35,33 @@ int main() {
 	{ // ray tracing
 		using namespace RayTracing;
 		using namespace glm;
-		Camera camera(1280, 720, 60);
-		SphereGeometry sphere;
-		sphere.position = vec3(0, 0, -10);
-		sphere.radius = 1.0;
+		Camera camera(1280, 720, 0.75);
+
+		std::vector<std::unique_ptr<Geometry>> geometries;
+		geometries.push_back(std::make_unique<SphereGeometry>(vec3(0, 0, -10), 1));
+		geometries.push_back(std::make_unique<SphereGeometry>(vec3(3, 0, -10), 1));
+		geometries.push_back(std::make_unique<SphereGeometry>(vec3(3, 3, -10), 1));
+		geometries.push_back(std::make_unique<TriangleGeometry>(vec3(-3, -1, -7), vec3(3, -1, -7), vec3(3, -1, -13)));
+		geometries.push_back(std::make_unique<TriangleGeometry>(vec3(3, -1, -13), vec3(-3, -1, -13), vec3(-3, -1, -7)));
+
+		std::vector<GLubyte> rs(geometries.size());
+		std::vector<GLubyte> gs(geometries.size());
+		std::vector<GLubyte> bs(geometries.size());
+		for (int g = 0; g < geometries.size(); ++g) {
+			rs[g] = rand();
+			gs[g] = rand();
+			bs[g] = rand();
+		}
+
 		for (int j = 0; j < 720; ++j) {
 			for (int i = 0; i < 1280; ++i) {
-				if (sphere.hit(camera.ray(i, j))) {
-					image[(i + j * 1280) * 4 + 0] = 255;
-					image[(i + j * 1280) * 4 + 1] = 255;
-					image[(i + j * 1280) * 4 + 2] = 255;
+				for (int g = 0; g < geometries.size(); ++g) {
+					auto& geometry = geometries[g];
+					if (geometry->hit(camera.ray(i, j))) {
+						image[(i + j * 1280) * 4 + 0] = rs[g];
+						image[(i + j * 1280) * 4 + 1] = gs[g];
+						image[(i + j * 1280) * 4 + 2] = bs[g];
+					}
 				}
 				image[(i + j * 1280) * 4 + 3] = 255;
 			}

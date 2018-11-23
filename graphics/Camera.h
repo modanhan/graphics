@@ -8,11 +8,11 @@ namespace RayTracing {
 	public:
 		int width;
 		int height;
-		float fov;
-		Camera(int width, int height, float fov)
+		float focalLength;
+		Camera(int width, int height, float focalLength)
 			: width(width)
 			, height(height)
-			, fov(fov) {
+			, focalLength(focalLength) {
 
 		}
 		~Camera() = default;
