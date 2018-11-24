@@ -36,58 +36,24 @@ int main() {
 		.addBuffer(1, 2, uvBufferData)
 		.build(6);
 
-	RayTracing::Camera camera(WIDTH, HEIGHT, 0.75);
-	auto cameraSsbo = ShaderStorageBuffer::Create(sizeof(RayTracing::Camera), &camera, GL_DYNAMIC_COPY, 0);
-
-	std::vector<GLubyte> image(WIDTH * HEIGHT * 4, 0);
-	{ // ray tracing
-		using namespace RayTracing;
-		using namespace glm;
-
-		std::vector<float> depth(WIDTH * HEIGHT, std::numeric_limits<float>::max());
-
-		std::vector<std::unique_ptr<Geometry>> geometries;
-		geometries.push_back(std::make_unique<SphereGeometry>(vec3(0, 0, -10), 1));
-	//	geometries.push_back(std::make_unique<SphereGeometry>(vec3(3, 0, -10), 1));
-	//	geometries.push_back(std::make_unique<SphereGeometry>(vec3(3, 3, -10), 1));
-		geometries.push_back(std::make_unique<TriangleGeometry>(vec3(-5, -1, -5), vec3(5, -1, -5), vec3(5, -1, -20)));
-	//	geometries.push_back(std::make_unique<TriangleGeometry>(vec3(3, -1, -13), vec3(-3, -1, -13), vec3(-3, -1, -7)));
-
-		std::vector<GLubyte> rs(geometries.size());
-		std::vector<GLubyte> gs(geometries.size());
-		std::vector<GLubyte> bs(geometries.size());
-		for (int g = 0; g < geometries.size(); ++g) {
-			rs[g] = rand();
-			gs[g] = rand();
-			bs[g] = rand();
-		}
-		std::cout.precision(3);
-		for (int j = 0; j < HEIGHT; ++j) {
-			for (int i = 0; i < WIDTH; ++i) {
-				for (int g = 0; g < geometries.size(); ++g) {
-					auto& geometry = geometries[g];
-					auto hit = geometry->hit(camera.ray(i, j));
-					if (hit && hit->length < depth[i + j * WIDTH]) {
-						depth[i + j * WIDTH] = hit->length;
-						image[(i + j * WIDTH) * 4 + 0] = rs[g];
-						image[(i + j * WIDTH) * 4 + 1] = gs[g];
-						image[(i + j * WIDTH) * 4 + 2] = bs[g];
-					}
-				}
-				image[(i + j * WIDTH) * 4 + 3] = 255;
-			}
-			std::cout << std::setw(5) << j * 100.0 / HEIGHT << "%\r" << std::flush;
-		}
-		std::cout << "100.0%\r" << std::flush;
-	}
-
-	auto texture = Texture::CreateRGBA(WIDTH, HEIGHT, image.data());
+	using namespace RayTracing;
+	using namespace glm;
+	Camera camera(WIDTH, HEIGHT, 0.29);
+	auto cameraSsbo = ShaderStorageBuffer::Create(sizeof(Camera), &camera, GL_DYNAMIC_COPY, 0);
+	std::vector<SphereGeometry> spheres;
+	spheres.push_back(SphereGeometry(vec3(0, 0, -10), 1));
+	spheres.push_back(SphereGeometry(vec3(3, 1, -12), 1));
+	spheres.push_back(SphereGeometry(vec3(-3, 0, -12), 1));
+	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
+	printf("%d\n", sizeof(spheres[0]) * spheres.size());
+	printf("%d\n", sizeof(vec3));
+	printf("%d\n", sizeof(float));
 
 	while (!window->shouldClose()) {
 		program->clear();
 		program->start();
 
-		texture->activate(0);
+		spheresSsbo->bind();
 		vertexArray->render();
 
 		program->finish();

@@ -18,7 +18,8 @@ namespace RayTracing {
 		float length;
 	};
 
-	class Geometry {
+#pragma pack(1)
+	struct Geometry {
 	public:
 		Geometry() = default;
 		virtual ~Geometry() = default;
@@ -27,11 +28,11 @@ namespace RayTracing {
 		}
 	};
 
-	class SphereGeometry : public Geometry {
+#pragma pack(1)
+	struct SphereGeometry {
 	public:
 		glm::vec3 position;
 		float radius;
-		std::unique_ptr<RayCast> hit(const Ray& ray) override;
 
 		SphereGeometry(glm::vec3 position, float radius)
 			: position(position)
@@ -41,7 +42,8 @@ namespace RayTracing {
 		~SphereGeometry() = default;
 	};
 
-	class TriangleGeometry : public Geometry {
+#pragma pack(1)
+	struct TriangleGeometry : public Geometry {
 	public:
 		glm::vec3 v0;
 		glm::vec3 v1;
