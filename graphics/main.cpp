@@ -12,25 +12,46 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "Geometry.h"
+#include "ShaderStorageBuffer.h"
 
 constexpr int WIDTH = 1280;
 constexpr int HEIGHT = 720;
 
 int main() {
+	auto window = Window::Create(WIDTH, HEIGHT);
+	auto vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex.glsl");
+	auto fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/raytracing_fragment.glsl");
+	auto program = GraphicProgram::Create(*vertexShader, *fragmentShader);
+
+	std::vector<GLfloat> vertexBufferData = {
+		-1, -1, 1, -1, 1, 1, 1, 1, -1, 1, -1, -1
+	};
+
+	std::vector<GLfloat> uvBufferData = {
+		0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0
+	};
+
+	auto vertexArray = VertexArray::Builder()
+		.addBuffer(0, 2, vertexBufferData)
+		.addBuffer(1, 2, uvBufferData)
+		.build(6);
+
+	RayTracing::Camera camera(WIDTH, HEIGHT, 0.75);
+	auto cameraSsbo = ShaderStorageBuffer::Create(sizeof(RayTracing::Camera), &camera, GL_DYNAMIC_COPY, 0);
+
 	std::vector<GLubyte> image(WIDTH * HEIGHT * 4, 0);
 	{ // ray tracing
 		using namespace RayTracing;
 		using namespace glm;
-		Camera camera(WIDTH, HEIGHT, 0.75);
 
 		std::vector<float> depth(WIDTH * HEIGHT, std::numeric_limits<float>::max());
 
 		std::vector<std::unique_ptr<Geometry>> geometries;
 		geometries.push_back(std::make_unique<SphereGeometry>(vec3(0, 0, -10), 1));
-		geometries.push_back(std::make_unique<SphereGeometry>(vec3(3, 0, -10), 1));
-		geometries.push_back(std::make_unique<SphereGeometry>(vec3(3, 3, -10), 1));
-		geometries.push_back(std::make_unique<TriangleGeometry>(vec3(-3, -1, -7), vec3(3, -1, -7), vec3(3, -1, -13)));
-		geometries.push_back(std::make_unique<TriangleGeometry>(vec3(3, -1, -13), vec3(-3, -1, -13), vec3(-3, -1, -7)));
+	//	geometries.push_back(std::make_unique<SphereGeometry>(vec3(3, 0, -10), 1));
+	//	geometries.push_back(std::make_unique<SphereGeometry>(vec3(3, 3, -10), 1));
+		geometries.push_back(std::make_unique<TriangleGeometry>(vec3(-5, -1, -5), vec3(5, -1, -5), vec3(5, -1, -20)));
+	//	geometries.push_back(std::make_unique<TriangleGeometry>(vec3(3, -1, -13), vec3(-3, -1, -13), vec3(-3, -1, -7)));
 
 		std::vector<GLubyte> rs(geometries.size());
 		std::vector<GLubyte> gs(geometries.size());
@@ -55,28 +76,10 @@ int main() {
 				}
 				image[(i + j * WIDTH) * 4 + 3] = 255;
 			}
-			std::cout << std::setw(6) << j * 100.0 / HEIGHT << "%\r" << std::flush;
+			std::cout << std::setw(5) << j * 100.0 / HEIGHT << "%\r" << std::flush;
 		}
-		std::cout << "100.00%\r" << std::flush;
+		std::cout << "100.0%\r" << std::flush;
 	}
-
-	auto window = Window::Create(WIDTH, HEIGHT);
-	auto vertexShader = Shader::Create(GL_VERTEX_SHADER, "../shaders/vertex.glsl");
-	auto fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "../shaders/fragment.glsl");
-	auto program = GraphicProgram::Create(*vertexShader, *fragmentShader);
-
-	std::vector<GLfloat> vertexBufferData = {
-		-1, -1, 1, -1, 1, 1, 1, 1, -1, 1, -1, -1
-	};
-
-	std::vector<GLfloat> uvBufferData = {
-		0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0
-	};
-
-	auto vertexArray = VertexArray::Builder()
-		.addBuffer(0, 2, vertexBufferData)
-		.addBuffer(1, 2, uvBufferData)
-		.build(6);
 
 	auto texture = Texture::CreateRGBA(WIDTH, HEIGHT, image.data());
 

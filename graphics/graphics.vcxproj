@@ -126,6 +126,7 @@
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GraphicProgram.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ShaderStorageBuffer.cpp" />
     <ClCompile Include="ShaderTools.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VertexArray.cpp" />
@@ -135,12 +136,18 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="GraphicProgram.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ShaderStorageBuffer.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="VertexArray.h" />
     <ClInclude Include="ShaderTools.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="graphics.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\fragment.glsl" />
+    <None Include="shaders\raytracing_fragment.glsl" />
+    <None Include="shaders\vertex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

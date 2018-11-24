@@ -3,6 +3,7 @@
 #include "Geometry.h"
 
 namespace RayTracing {
+
 	class Camera
 	{
 	public:

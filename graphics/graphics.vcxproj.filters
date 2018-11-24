@@ -13,6 +13,7 @@
     <ClCompile Include="Camera.cpp">
       <Filter>ray-tracing</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderStorageBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicProgram.h" />
@@ -26,13 +27,28 @@
     <ClInclude Include="Camera.h">
       <Filter>ray-tracing</Filter>
     </ClInclude>
+    <ClInclude Include="ShaderStorageBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ray-tracing">
       <UniqueIdentifier>{072aa1e7-037a-4341-b4b0-1b1d1abee3c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{d6e1fce3-9b05-43a5-94fa-e2c49b4bf181}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="graphics.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\fragment.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\vertex.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\raytracing_fragment.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
