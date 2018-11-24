@@ -36,11 +36,20 @@ int main() {
 		.addBuffer(1, 2, uvBufferData)
 		.build(6);
 
-	RayTracing::Camera camera(WIDTH, HEIGHT, 0.75);
-	auto cameraSsbo = ShaderStorageBuffer::Create(sizeof(RayTracing::Camera), &camera, GL_DYNAMIC_COPY, 0);
+	using namespace RayTracing;
+	using namespace glm;
+	Camera camera(WIDTH, HEIGHT, 0.75);
+	auto cameraSsbo = ShaderStorageBuffer::Create(sizeof(Camera), &camera, GL_DYNAMIC_COPY, 0);
+	std::vector<SphereGeometry> spheres;
+	spheres.push_back(SphereGeometry(vec3(0, 0, -10), 1));
+	spheres.push_back(SphereGeometry(vec3(3, 1, -12), 1));
+	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
+	printf("%d\n", sizeof(SphereGeometry));
+	printf("%d\n", sizeof(vec3));
+	printf("%d\n", sizeof(float));
 
 	std::vector<GLubyte> image(WIDTH * HEIGHT * 4, 0);
-	{ // ray tracing
+	if(0){ // ray tracing
 		using namespace RayTracing;
 		using namespace glm;
 
@@ -81,13 +90,11 @@ int main() {
 		std::cout << "100.0%\r" << std::flush;
 	}
 
-	auto texture = Texture::CreateRGBA(WIDTH, HEIGHT, image.data());
-
 	while (!window->shouldClose()) {
 		program->clear();
 		program->start();
 
-		texture->activate(0);
+		spheresSsbo->bind();
 		vertexArray->render();
 
 		program->finish();

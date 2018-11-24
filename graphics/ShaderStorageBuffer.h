@@ -37,5 +37,9 @@ public:
 	~ShaderStorageBuffer() {
 		glDeleteBuffers(1, &ssbo);
 	}
+	int bind() {
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+		return 0;
+	}
 };
 
