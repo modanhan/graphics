@@ -24,7 +24,7 @@ layout(std430, binding = 2) buffer triangle_buffer { triangle_data[] triangles; 
 
 out vec4 FragmentColour;
 
-const float EPSILON = 0.00001;
+const float EPSILON = 0.00005;
 
 struct hit {
 	vec3 normal;
@@ -44,6 +44,10 @@ float length2(vec3 v) {
 
 vec3 proj(vec3 u, vec3 v) {
 	return v * dot(u, v) / dot(v, v);
+}
+
+vec3 _random(vec3 v) {
+	return fract(cross(v * 5.31, vec3(23.45, 345.67, 89.45)) * 8.54) * 2 - 1;
 }
 
 vec2 quadratic(float a, float b, float c) {
@@ -135,11 +139,17 @@ void main(void)
 
 	vec3 hit_position = direction * d;
 	float intensity = 0;
-	for (int i = 0; i < 1; ++i) {
+	vec3 n_d = hit_position;
+	int iterations = 512;
+	for (int i = 0; i < iterations; ++i) {
 		bool s_hit = false;
 
+		n_d = normalize(_random(n_d));
+		if (dot(n_d, normal) < 0) n_d = -n_d;
+		if (n_d.y < 0) continue;
+
 		for (int i = 0; i < spheres.length(); ++i) {
-			hit h = sphere_hit(spheres[i], hit_position + vec3(0,1,0) * EPSILON, vec3(0,1,0));
+			hit h = sphere_hit(spheres[i], hit_position + n_d * EPSILON, n_d);
 			if (h.d < 1e+38) {
 				s_hit = true;
 				break;
@@ -147,7 +157,7 @@ void main(void)
 		}
 		if (!s_hit)
 		for (int i = 0; i < triangles.length(); ++i) {
-			hit h = triangle_hit(triangles[i], hit_position + vec3(0,1,0) * EPSILON, vec3(0,1,0));
+			hit h = triangle_hit(triangles[i], hit_position + n_d * EPSILON, n_d);
 			if (h.d < 1e+38) {
 				s_hit = true;
 				break;
@@ -157,6 +167,5 @@ void main(void)
 			intensity += 1.0;
 	}
 
-	FragmentColour.xyz = vec3(intensity);
-	//FragmentColour.xyz = normal;
+	FragmentColour.xyz = vec3(intensity / iterations);
 }
