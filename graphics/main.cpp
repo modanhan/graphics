@@ -27,33 +27,32 @@ int main() {
 		-1, -1, 1, -1, 1, 1, 1, 1, -1, 1, -1, -1
 	};
 
-	std::vector<GLfloat> uvBufferData = {
-		0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0
-	};
-
 	auto vertexArray = VertexArray::Builder()
 		.addBuffer(0, 2, vertexBufferData)
-		.addBuffer(1, 2, uvBufferData)
 		.build(6);
 
 	using namespace RayTracing;
 	using namespace glm;
-	Camera camera(WIDTH, HEIGHT, 0.29);
+	Camera camera(WIDTH, HEIGHT, 1);
 	auto cameraSsbo = ShaderStorageBuffer::Create(sizeof(Camera), &camera, GL_DYNAMIC_COPY, 0);
+
 	std::vector<SphereGeometry> spheres;
-	spheres.push_back(SphereGeometry(vec3(0, 0, -10), 1));
-	spheres.push_back(SphereGeometry(vec3(3, 1, -12), 1));
-	spheres.push_back(SphereGeometry(vec3(-3, 0, -12), 1));
+	spheres.push_back(SphereGeometry(vec3(0, 0, -7), 1));
+	spheres.push_back(SphereGeometry(vec3(3, 2, -15), 3));
+	spheres.push_back(SphereGeometry(vec3(-3, 0, -10), 1));
 	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
-	printf("%d\n", sizeof(spheres[0]) * spheres.size());
-	printf("%d\n", sizeof(vec3));
-	printf("%d\n", sizeof(float));
+
+	std::vector<TriangleGeometry> triangles;
+	triangles.push_back(TriangleGeometry(vec3(-5, -1, -5), vec3(5, -1, -5), vec3(5, -1, -20)));
+	triangles.push_back(TriangleGeometry(vec3(5, -1, -20), vec3(-5, -1, -20), vec3(-5, -1, -5)));
+	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
 	while (!window->shouldClose()) {
 		program->clear();
 		program->start();
 
 		spheresSsbo->bind();
+		trianglessSsbo->bind();
 		vertexArray->render();
 
 		program->finish();
