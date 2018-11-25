@@ -24,7 +24,7 @@ layout(std430, binding = 2) buffer triangle_buffer { triangle_data[] triangles; 
 
 out vec4 FragmentColour;
 
-const float EPSILON = 1e-6;
+const float EPSILON = 0.00001;
 
 struct hit {
 	vec3 normal;
@@ -46,6 +46,17 @@ vec3 proj(vec3 u, vec3 v) {
 	return v * dot(u, v) / dot(v, v);
 }
 
+vec2 quadratic(float a, float b, float c) {
+	float d = b * b - 4 * a * c;
+	if (d < 0) return vec2(-1e+38);
+	float q = (b > 0) ?
+		-0.5 * (b + sqrt(d)) :
+		-0.5 * (b - sqrt(d));
+	float x0 = q / a;
+	float x1 = c / q;
+	return vec2(min(x0, x1), max(x0, x1));
+}
+
 vec3 ray_direction (float i, float j) {
 	vec3 origin = vec3(0);
 	float x = i / camera.width;
@@ -56,31 +67,16 @@ vec3 ray_direction (float i, float j) {
 }
 
 hit sphere_hit(sphere_data s, vec3 origin, vec3 direction) {
-	vec3 v_pc = s.position - origin;
-	if (dot(v_pc, direction) < 0) {
-		if (length2(v_pc) > s.radius * s.radius) {
-			return createHit(vec3(0), 1e+38);
-		}
-		vec3 pc = proj(s.position - origin, direction);
-		float d = sqrt(s.radius * s.radius - length2(pc - s.position));
-		d -= length(origin - pc);
-		return createHit(normalize(origin + direction * d - s.position), d);
+	vec3 l = origin - s.position;
+	float a = dot(direction, direction);
+	float b = 2 * dot(direction, l);
+	float c = dot(l, l) - s.radius * s.radius;
+	vec2 q = quadratic(a, b, c);
+	if (q.x < 0) {
+		q.x = q.y;
+		if (q.x < 0) return createHit(vec3(0), 1e+38);
 	}
-	else {
-		vec3 pc = proj(s.position - origin, direction);
-		if (length2(s.position - pc) > s.radius * s.radius) {
-			return createHit(vec3(0), 1e+38);
-		}
-		float d = sqrt(s.radius * s.radius - length2(pc - s.position));
-		if (length2(v_pc) > s.radius * s.radius) {
-			d = length(pc - origin) - d;
-		}
-		else {
-			d = length(pc - origin) + d;
-		}
-		return createHit(normalize(origin + direction * d - s.position), d);
-	}
-	return createHit(vec3(0), 1e+38);
+	return createHit(normalize(origin + direction * q.x - s.position), q.x);
 }
 
 hit triangle_hit(triangle_data tri, vec3 origin, vec3 direction) {
@@ -90,8 +86,8 @@ hit triangle_hit(triangle_data tri, vec3 origin, vec3 direction) {
 	edge2 = tri.v2 - tri.v0;
 	h = cross(direction, edge2);
 	a = dot(edge1, h);
-	if (a > -EPSILON && a < EPSILON)
-		return createHit(vec3(0), 1e+38);    // This ray is parallel to this triangle.
+//	if (a > -EPSILON && a < EPSILON)
+//		return createHit(vec3(0), 1e+38);    // This ray is parallel to this triangle.
 	f = 1.0 / a;
 	s = origin - tri.v0;
 	u = f * dot(s, h);
@@ -103,7 +99,7 @@ hit triangle_hit(triangle_data tri, vec3 origin, vec3 direction) {
 		return createHit(vec3(0), 1e+38);
 	// At this stage we can compute t to find out where the intersection point is on the line.
 	float t = f * dot(edge2, q);
-	if (t > EPSILON) // ray intersection
+	if (t > 0) // ray intersection
 	{
 		return createHit(normalize(cross(edge1, edge2)), t);
 	}
@@ -114,19 +110,21 @@ hit triangle_hit(triangle_data tri, vec3 origin, vec3 direction) {
 void main(void)
 {
 	float d = 1e+38;
-	vec3 color;
+	vec3 normal;
+	vec3 camera_position = vec3(0);
+	vec3 direction = ray_direction(gl_FragCoord.x, gl_FragCoord.y);
 	for (int i = 0; i < spheres.length(); ++i) {
-		hit h = sphere_hit(spheres[i], vec3(0), ray_direction(gl_FragCoord.x, gl_FragCoord.y));
+		hit h = sphere_hit(spheres[i], camera_position, direction);
 		if (h.d < d) {
 			d = h.d;
-			color = h.normal;
+			normal = h.normal;
 		}
 	}
 	for (int i = 0; i < triangles.length(); ++i) {
-		hit h = triangle_hit(triangles[i], vec3(0), ray_direction(gl_FragCoord.x, gl_FragCoord.y));
+		hit h = triangle_hit(triangles[i], camera_position, direction);
 		if (h.d < d) {
 			d = h.d;
-			color = h.normal;
+			normal = h.normal;
 		}
 	}
 
@@ -134,5 +132,31 @@ void main(void)
 		FragmentColour.xyz = vec3(0);
 		return;
 	}
-	FragmentColour.xyz = color;
+
+	vec3 hit_position = direction * d;
+	float intensity = 0;
+	for (int i = 0; i < 1; ++i) {
+		bool s_hit = false;
+
+		for (int i = 0; i < spheres.length(); ++i) {
+			hit h = sphere_hit(spheres[i], hit_position + vec3(0,1,0) * EPSILON, vec3(0,1,0));
+			if (h.d < 1e+38) {
+				s_hit = true;
+				break;
+			}
+		}
+		if (!s_hit)
+		for (int i = 0; i < triangles.length(); ++i) {
+			hit h = triangle_hit(triangles[i], hit_position + vec3(0,1,0) * EPSILON, vec3(0,1,0));
+			if (h.d < 1e+38) {
+				s_hit = true;
+				break;
+			}
+		}
+		if (!s_hit)
+			intensity += 1.0;
+	}
+
+	FragmentColour.xyz = vec3(intensity);
+	//FragmentColour.xyz = normal;
 }
