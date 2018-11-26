@@ -123,6 +123,7 @@
   <ItemGroup>
     <ClCompile Include="..\middleware\glad\src\glad.c" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GraphicProgram.cpp" />
     <ClCompile Include="main.cpp" />
@@ -133,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="GraphicProgram.h" />
     <ClInclude Include="resource.h" />
@@ -145,8 +147,10 @@
     <ResourceCompile Include="graphics.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\fragment-denoise.glsl" />
     <None Include="shaders\fragment.glsl" />
-    <None Include="shaders\raytracing_fragment.glsl" />
+    <None Include="shaders\fragment-raytracing.glsl" />
+    <None Include="shaders\vertex-uv.glsl" />
     <None Include="shaders\vertex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

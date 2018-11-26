@@ -24,7 +24,7 @@ layout(std430, binding = 2) buffer triangle_buffer { triangle_data[] triangles; 
 
 out vec4 FragmentColour;
 
-const float EPSILON = 0.00005;
+const float EPSILON = 0.0001;
 
 struct hit {
 	vec3 normal;
@@ -133,14 +133,14 @@ void main(void)
 	}
 
 	if (d == 1e+38) {
-		FragmentColour.xyz = vec3(0);
+		FragmentColour.xyz = vec3(1);
 		return;
 	}
 
-	vec3 hit_position = direction * d;
+	vec3 hit_position = camera_position + direction * d;
 	float intensity = 0;
 	vec3 n_d = hit_position;
-	int iterations = 512;
+	int iterations = 160;
 	for (int i = 0; i < iterations; ++i) {
 		bool s_hit = false;
 

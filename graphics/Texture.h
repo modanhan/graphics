@@ -8,8 +8,8 @@
 class Texture
 {
 	Texture() = default;
-	GLuint texture;
 public:
+	GLuint texture;
 
 	~Texture();
 
