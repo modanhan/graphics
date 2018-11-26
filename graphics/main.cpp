@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <limits>
+#include <chrono>
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
@@ -61,26 +62,34 @@ int main() {
 	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
-	while (!window->shouldClose()) {
-		rt_fbo->bind(); {
-			rt_program->clear();
-			rt_program->start();
+	auto beforeRenderTimePoint = std::chrono::high_resolution_clock::now();
+	rt_fbo->bind(); {
+		rt_program->clear();
+		rt_program->start();
 
-			spheresSsbo->bind();
-			trianglessSsbo->bind();
-			rt_vertexArray->render();
+		spheresSsbo->bind();
+		trianglessSsbo->bind();
+		rt_vertexArray->render();
 
-			rt_program->finish();
-		} FrameBuffer::unbind();
-
-		{
-			program->clear();
-			program->start();
-			postprocessVertexArray->render();
-			program->finish();
-		}
-
-		window->swap();
+		rt_program->finish();
+	} FrameBuffer::unbind();
+	auto rayTraceDuration = std::chrono::high_resolution_clock::now() - beforeRenderTimePoint;
+	beforeRenderTimePoint = std::chrono::high_resolution_clock::now();
+	{
+		program->clear();
+		program->start();
+		postprocessVertexArray->render();
+		program->finish();
 	}
+	auto denoiseDuration = std::chrono::high_resolution_clock::now() - beforeRenderTimePoint;
+	window->swap();
+
+	printf("Raytrace us:\t%u\n", std::chrono::duration_cast<std::chrono::microseconds>(rayTraceDuration).count());
+	printf("Denoise us:\t%u\n", std::chrono::duration_cast<std::chrono::microseconds>(denoiseDuration).count());
+
+	while (!window->shouldClose()) {
+		glfwPollEvents();
+	}
+
 	return 0;
 }

@@ -140,7 +140,7 @@ void main(void)
 	vec3 hit_position = camera_position + direction * d;
 	float intensity = 0;
 	vec3 n_d = hit_position;
-	int iterations = 160;
+	int iterations = 256;
 	for (int i = 0; i < iterations; ++i) {
 		bool s_hit = false;
 
