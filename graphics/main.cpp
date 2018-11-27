@@ -27,9 +27,13 @@ int main() {
 	auto rt_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex.glsl");
 	auto rt_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-deferred-rt.glsl");
 	auto rt_program = GraphicProgram::Create(*rt_vertexShader, *rt_fragmentShader);
+
 	auto deferred_fbo = FrameBuffer::Builder()
 		.addColorAttachment(0, Texture::CreateHDR(WIDTH, HEIGHT, 0))
 		.addColorAttachment(1, Texture::CreateHDR(WIDTH, HEIGHT, 0))
+		.build();
+	auto shade_fbo = FrameBuffer::Builder()
+		.addColorAttachment(0, Texture::CreateRGBA(WIDTH, HEIGHT, 0))
 		.build();
 
 	auto shading_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
@@ -80,7 +84,7 @@ int main() {
 		rt_program->finish();
 	} FrameBuffer::unbind();
 
-	{
+	shade_fbo->bind(); {
 		shading_program->clear();
 		shading_program->start();
 		deferred_fbo->activate(0, 0);
@@ -89,6 +93,14 @@ int main() {
 		trianglessSsbo->bind();
 		postVertexArray->render();
 		shading_program->finish();
+	} FrameBuffer::unbind();
+
+	{
+		post_program->clear();
+		post_program->start();
+		shade_fbo->activate(0, 0);
+		postVertexArray->render();
+		post_program->finish();
 	}
 
 	auto timePoint = std::chrono::high_resolution_clock::now();
