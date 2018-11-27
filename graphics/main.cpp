@@ -25,12 +25,15 @@ constexpr int HEIGHT = 720;
 int main() {
 	auto window = Window::Create(WIDTH, HEIGHT);
 	auto rt_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex.glsl");
-	auto rt_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-raytracing.glsl");
+	auto rt_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-deferred-rt.glsl");
 	auto rt_program = GraphicProgram::Create(*rt_vertexShader, *rt_fragmentShader);
-	auto rt_fbo = FrameBuffer::Create(WIDTH, HEIGHT);
+	auto deferred_fbo = FrameBuffer::Builder()
+		.addColorAttachment(0, Texture::CreateFloat(WIDTH, HEIGHT, 0))
+		.addColorAttachment(1, Texture::CreateHDR(WIDTH, HEIGHT, 0))
+		.build();
 
 	auto vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
-	auto fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-denoise.glsl");
+	auto fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment.glsl");
 	auto program = GraphicProgram::Create(*vertexShader, *fragmentShader);
 
 	glfwSwapInterval(0);
@@ -64,30 +67,31 @@ int main() {
 	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
+	deferred_fbo->bind(); {
+		rt_program->clear();
+		rt_program->start();
+
+		spheresSsbo->bind();
+		trianglessSsbo->bind();
+		rt_vertexArray->render();
+
+		rt_program->finish();
+	} FrameBuffer::unbind();
+
+	{
+		program->clear();
+		program->start();
+		deferred_fbo->activate(0, 0);
+		postprocessVertexArray->render();
+		program->finish();
+	}
+
+	auto timePoint = std::chrono::high_resolution_clock::now();
+	window->swap();
+	auto duration = std::chrono::high_resolution_clock::now() - timePoint;
+	printf("us:\t%u\n", std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
+
 	while (!window->shouldClose()) {
-		rt_fbo->bind(); {
-			rt_program->clear();
-			rt_program->start();
-
-			spheresSsbo->bind();
-			trianglessSsbo->bind();
-			rt_vertexArray->render();
-
-			rt_program->finish();
-		} FrameBuffer::unbind();
-
-		{
-			program->clear();
-			program->start();
-			postprocessVertexArray->render();
-			program->finish();
-		}
-
-		auto timePoint = std::chrono::high_resolution_clock::now();
-		window->swap();
-		auto duration = std::chrono::high_resolution_clock::now() - timePoint;
-		printf("us:\t%u\n", std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
-
 		glfwPollEvents();
 	}
 

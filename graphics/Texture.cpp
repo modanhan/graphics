@@ -21,6 +21,36 @@ std::unique_ptr<Texture> Texture::CreateRGBA(GLsizei width, GLsizei height, cons
 	return std::move(texture);
 }
 
+std::unique_ptr<Texture> Texture::CreateFloat(GLsizei width, GLsizei height, const void* data) {
+	auto texture = std::unique_ptr<Texture>(new Texture());
+
+	glGenTextures(1, &texture->texture);
+	glBindTexture(GL_TEXTURE_2D, texture->texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_FLOAT, data);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	// return nullptr if glGetError
+	return std::move(texture);
+}
+
+std::unique_ptr<Texture> Texture::CreateHDR(GLsizei width, GLsizei height, const void* data) {
+	auto texture = std::unique_ptr<Texture>(new Texture());
+
+	glGenTextures(1, &texture->texture);
+	glBindTexture(GL_TEXTURE_2D, texture->texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, data);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	// return nullptr if glGetError
+	return std::move(texture);
+}
+
 int Texture::activate(int target) {
 	glActiveTexture(GL_TEXTURE0 + target);
 	glBindTexture(GL_TEXTURE_2D, texture);

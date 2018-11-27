@@ -5,7 +5,7 @@
 
 in vec2 UV;
 
-out vec4 FragmentColour;
+layout(location = 0) out vec4 FragmentColour;
 
 uniform sampler2D ColourTexture;
 

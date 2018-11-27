@@ -14,6 +14,8 @@ public:
 	~Texture();
 
 	static std::unique_ptr<Texture> CreateRGBA(GLsizei width, GLsizei height, const void* data);
+	static std::unique_ptr<Texture> CreateFloat(GLsizei width, GLsizei height, const void* data);
+	static std::unique_ptr<Texture> CreateHDR(GLsizei width, GLsizei height, const void* data);
 	int activate(int target);
 };
 

@@ -147,6 +147,7 @@
     <ResourceCompile Include="graphics.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\fragment-deferred-rt.glsl" />
     <None Include="shaders\fragment-denoise.glsl" />
     <None Include="shaders\fragment.glsl" />
     <None Include="shaders\fragment-raytracing.glsl" />
