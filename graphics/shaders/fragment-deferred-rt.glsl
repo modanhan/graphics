@@ -22,7 +22,7 @@ layout(std430, binding = 0) buffer camera_buffer { camera_data camera; };
 layout(std430, binding = 1) buffer sphere_buffer { sphere_data[] spheres; };
 layout(std430, binding = 2) buffer triangle_buffer { triangle_data[] triangles; };
 
-layout(location = 0) out float FragmentDepth;
+layout(location = 0) out vec4 FragmentDepth;
 layout(location = 1) out vec4 FragmentNormal;
 
 const float EPSILON = 0.0001;
@@ -129,11 +129,11 @@ void main(void)
 	}
 
 	if (d == 1e+38) {
-		FragmentDepth = d;
+		FragmentDepth.x = d;
 		FragmentNormal = vec4(-direction, 1.0);
 		return;
 	}
 
-	FragmentDepth = d;
+	FragmentDepth.x = d;
 	FragmentNormal = vec4(normal, 1.0);
 }

@@ -22,8 +22,12 @@ layout(std430, binding = 0) buffer camera_buffer { camera_data camera; };
 layout(std430, binding = 1) buffer sphere_buffer { sphere_data[] spheres; };
 layout(std430, binding = 2) buffer triangle_buffer { triangle_data[] triangles; };
 
-layout(location = 0) out float FragmentDepth;
-layout(location = 1) out vec4 FragmentNormal;
+in vec2 UV;
+
+layout(location = 0) uniform sampler2D DepthTexture;
+layout(location = 1) uniform sampler2D NormalTexture;
+
+layout(location = 0) out vec4 FragmentColour;
 
 const float EPSILON = 0.0001;
 
@@ -109,31 +113,46 @@ hit triangle_hit(triangle_data tri, vec3 origin, vec3 direction) {
 
 void main(void)
 {
-	float d = 1e+38;
-	vec3 normal;
+	float d = texture(DepthTexture, UV).x;
+	vec3 normal = texture(NormalTexture, UV).xyz;
 	vec3 camera_position = vec3(0);
 	vec3 direction = ray_direction(gl_FragCoord.x, gl_FragCoord.y);
-	for (int i = 0; i < spheres.length(); ++i) {
-		hit h = sphere_hit(spheres[i], camera_position, direction);
-		if (h.d < d) {
-			d = h.d;
-			normal = h.normal;
-		}
-	}
-	for (int i = 0; i < triangles.length(); ++i) {
-		hit h = triangle_hit(triangles[i], camera_position, direction);
-		if (h.d < d) {
-			d = h.d;
-			normal = h.normal;
-		}
-	}
-
-	if (d == 1e+38) {
-		FragmentDepth = d;
-		FragmentNormal = vec4(-direction, 1.0);
+	
+	// todo: 16 bit float max value, we'll need to improve different texture type's formats
+	if (d >= 1e+4) {
+		FragmentColour.xyz = vec3(1);
 		return;
 	}
 
-	FragmentDepth = d;
-	FragmentNormal = vec4(normal, 1.0);
+	vec3 hit_position = camera_position + direction * d;
+	float intensity = 0;
+	vec3 n_d = hit_position;
+	int iterations = 256;
+	for (int i = 0; i < iterations; ++i) {
+		bool s_hit = false;
+
+		n_d = normalize(_random(n_d));
+		if (dot(n_d, normal) < 0) n_d = -n_d;
+		if (n_d.y < 0) continue;
+
+		for (int i = 0; i < spheres.length(); ++i) {
+			hit h = sphere_hit(spheres[i], hit_position + n_d * EPSILON, n_d);
+			if (h.d < 1e+38) {
+				s_hit = true;
+				break;
+			}
+		}
+		if (!s_hit)
+		for (int i = 0; i < triangles.length(); ++i) {
+			hit h = triangle_hit(triangles[i], hit_position + n_d * EPSILON, n_d);
+			if (h.d < 1e+38) {
+				s_hit = true;
+				break;
+			}
+		}
+		if (!s_hit)
+			intensity += 1.0;
+	}
+
+	FragmentColour.xyz = vec3(intensity / iterations);
 }

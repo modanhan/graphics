@@ -52,13 +52,13 @@
     <None Include="shaders\vertex-uv.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\fragment-raytracing.glsl">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="shaders\fragment-denoise.glsl">
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\fragment-deferred-rt.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\fragment-deferred-shade.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

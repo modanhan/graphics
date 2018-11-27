@@ -31,11 +31,11 @@ public:
 			glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->fbo);
 		}
 
-		Builder& addColorAttachment(int target, std::unique_ptr<Texture> texture) {
-			frameBuffer->colorAttachments.emplace(target, std::move(texture));
-			glBindTexture(GL_TEXTURE_2D, frameBuffer->colorAttachments.at(target)->texture);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + target, GL_TEXTURE_2D,
-				frameBuffer->colorAttachments.at(target)->texture, 0);
+		Builder& addColorAttachment(int colorAttachment, std::unique_ptr<Texture> texture) {
+			frameBuffer->colorAttachments.emplace(colorAttachment, std::move(texture));
+			glBindTexture(GL_TEXTURE_2D, frameBuffer->colorAttachments.at(colorAttachment)->texture);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + colorAttachment, GL_TEXTURE_2D,
+				frameBuffer->colorAttachments.at(colorAttachment)->texture, 0);
 			return *this;
 		}
 

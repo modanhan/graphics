@@ -148,9 +148,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\fragment-deferred-rt.glsl" />
+    <None Include="shaders\fragment-deferred-shade.glsl" />
     <None Include="shaders\fragment-denoise.glsl" />
     <None Include="shaders\fragment.glsl" />
-    <None Include="shaders\fragment-raytracing.glsl" />
     <None Include="shaders\vertex-uv.glsl" />
     <None Include="shaders\vertex.glsl" />
   </ItemGroup>

@@ -28,15 +28,17 @@ int main() {
 	auto rt_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-deferred-rt.glsl");
 	auto rt_program = GraphicProgram::Create(*rt_vertexShader, *rt_fragmentShader);
 	auto deferred_fbo = FrameBuffer::Builder()
-		.addColorAttachment(0, Texture::CreateFloat(WIDTH, HEIGHT, 0))
+		.addColorAttachment(0, Texture::CreateHDR(WIDTH, HEIGHT, 0))
 		.addColorAttachment(1, Texture::CreateHDR(WIDTH, HEIGHT, 0))
 		.build();
 
-	auto vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
-	auto fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment.glsl");
-	auto program = GraphicProgram::Create(*vertexShader, *fragmentShader);
+	auto shading_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
+	auto shading_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-deferred-shade.glsl");
+	auto shading_program = GraphicProgram::Create(*shading_vertexShader, *shading_fragmentShader);
 
-	glfwSwapInterval(0);
+	auto post_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
+	auto post_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-denoise.glsl");
+	auto post_program = GraphicProgram::Create(*post_vertexShader, *post_fragmentShader);
 
 	std::vector<GLfloat> vertexBufferData = {
 		-1, -1, 1, -1, 1, 1, 1, 1, -1, 1, -1, -1
@@ -48,7 +50,7 @@ int main() {
 	auto rt_vertexArray = VertexArray::Builder()
 		.addBuffer(0, 2, vertexBufferData)
 		.build(6);
-	auto postprocessVertexArray = VertexArray::Builder()
+	auto postVertexArray = VertexArray::Builder()
 		.addBuffer(0, 2, vertexBufferData)
 		.addBuffer(1, 2, vertexUVBufferData)
 		.build(6);
@@ -79,11 +81,14 @@ int main() {
 	} FrameBuffer::unbind();
 
 	{
-		program->clear();
-		program->start();
+		shading_program->clear();
+		shading_program->start();
 		deferred_fbo->activate(0, 0);
-		postprocessVertexArray->render();
-		program->finish();
+		deferred_fbo->activate(1, 1);
+		spheresSsbo->bind();
+		trianglessSsbo->bind();
+		postVertexArray->render();
+		shading_program->finish();
 	}
 
 	auto timePoint = std::chrono::high_resolution_clock::now();
