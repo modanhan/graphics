@@ -25,20 +25,12 @@ constexpr int HEIGHT = 720;
 int main() {
 	auto window = Window::Create(WIDTH, HEIGHT);
 	auto rt_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex.glsl");
-	auto rt_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-deferred-rt.glsl");
+	auto rt_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-rt.glsl");
 	auto rt_program = GraphicProgram::Create(*rt_vertexShader, *rt_fragmentShader);
 
-	auto deferred_fbo = FrameBuffer::Builder()
-		.addColorAttachment(0, Texture::CreateHDR(WIDTH, HEIGHT, 0))
-		.addColorAttachment(1, Texture::CreateHDR(WIDTH, HEIGHT, 0))
-		.build();
-	auto shade_fbo = FrameBuffer::Builder()
+	auto rt_fbo = FrameBuffer::Builder()
 		.addColorAttachment(0, Texture::CreateRGBA(WIDTH, HEIGHT, 0))
 		.build();
-
-	auto shading_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
-	auto shading_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-deferred-shade.glsl");
-	auto shading_program = GraphicProgram::Create(*shading_vertexShader, *shading_fragmentShader);
 
 	auto post_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
 	auto post_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-denoise.glsl");
@@ -73,7 +65,7 @@ int main() {
 	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
-	deferred_fbo->bind(); {
+	rt_fbo->bind(); {
 		rt_program->clear();
 		rt_program->start();
 
@@ -84,21 +76,10 @@ int main() {
 		rt_program->finish();
 	} FrameBuffer::unbind();
 
-	shade_fbo->bind(); {
-		shading_program->clear();
-		shading_program->start();
-		deferred_fbo->activate(0, 0);
-		deferred_fbo->activate(1, 1);
-		spheresSsbo->bind();
-		trianglessSsbo->bind();
-		postVertexArray->render();
-		shading_program->finish();
-	} FrameBuffer::unbind();
-
 	{
 		post_program->clear();
 		post_program->start();
-		shade_fbo->activate(0, 0);
+		rt_fbo->activate(0, 0);
 		postVertexArray->render();
 		post_program->finish();
 	}
