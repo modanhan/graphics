@@ -9,7 +9,7 @@ layout(location = 0) out vec4 FragmentColour;
 
 uniform sampler2D ColourTexture;
 
-float exponent = 6;
+float exponent = 16;
 
 void main(void)
 {
@@ -26,6 +26,5 @@ void main(void)
 			total += weight;
 		}
 	}
-    FragmentColour = texture(ColourTexture, UV);
 	FragmentColour = color / total;
 }

@@ -32,6 +32,14 @@ int main() {
 		.addColorAttachment(0, Texture::CreateRGBA(WIDTH, HEIGHT, 0))
 		.build();
 
+	auto msaa_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
+	auto msaa_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-rt-adaptive-msaa.glsl");
+	auto msaa_program = GraphicProgram::Create(*msaa_vertexShader, *msaa_fragmentShader);
+
+	auto msaa_fbo = FrameBuffer::Builder()
+		.addColorAttachment(0, Texture::CreateRGBA(WIDTH, HEIGHT, 0))
+		.build();
+
 	auto post_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
 	auto post_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-denoise.glsl");
 	auto post_program = GraphicProgram::Create(*post_vertexShader, *post_fragmentShader);
@@ -76,12 +84,24 @@ int main() {
 		rt_program->finish();
 	} FrameBuffer::unbind();
 
-	{
+	msaa_fbo->bind(); {
 		post_program->clear();
 		post_program->start();
 		rt_fbo->activate(0, 0);
 		postVertexArray->render();
 		post_program->finish();
+	} FrameBuffer::unbind();
+
+	{
+		msaa_program->clear();
+		msaa_program->start();
+
+		spheresSsbo->bind();
+		trianglessSsbo->bind();
+		msaa_fbo->activate(0, 0);
+		postVertexArray->render();
+
+		msaa_program->finish();
 	}
 
 	auto timePoint = std::chrono::high_resolution_clock::now();

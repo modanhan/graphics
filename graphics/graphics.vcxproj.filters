@@ -64,5 +64,8 @@
     <None Include="shaders\fragment-rt.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\fragment-rt-adaptive-msaa.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
