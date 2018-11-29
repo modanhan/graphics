@@ -9,6 +9,7 @@ struct camera_data {
 
 struct sphere_data {
 	vec3 position;
+	vec3 emission;
 	float radius;
 };
 
@@ -25,11 +26,20 @@ layout(std430, binding = 2) buffer triangle_buffer { triangle_data[] triangles; 
 struct hit {
 	vec3 normal;
 	float d;
+	vec3 emission;
 };
 
 hit createHit(vec3 normal, float d) {
 	hit h;
 	h.normal = normal;
 	h.d = d;
+	return h;
+}
+
+hit createHit(vec3 normal, float d, vec3 emission) {
+	hit h;
+	h.normal = normal;
+	h.d = d;
+	h.emission = emission;
 	return h;
 }

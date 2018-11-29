@@ -34,7 +34,7 @@ int main() {
 	auto rt_program = GraphicProgram::Create(*rt_vertexShader, *rt_fragmentShader);
 
 	auto rt_fbo = FrameBuffer::Builder()
-		.addColorAttachment(0, Texture::CreateRGBA(WIDTH, HEIGHT, 0))
+		.addColorAttachment(0, Texture::CreateHDR(WIDTH, HEIGHT, 0))
 		.build();
 
 	auto msaa_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
@@ -47,12 +47,19 @@ int main() {
 	auto msaa_program = GraphicProgram::Create(*msaa_vertexShader, *msaa_fragmentShader);
 
 	auto msaa_fbo = FrameBuffer::Builder()
+		.addColorAttachment(0, Texture::CreateHDR(WIDTH, HEIGHT, 0))
+		.build();
+	auto tonemap_fbo = FrameBuffer::Builder()
 		.addColorAttachment(0, Texture::CreateRGBA(WIDTH, HEIGHT, 0))
 		.build();
 
-	auto post_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
-	auto post_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-denoise.glsl");
-	auto post_program = GraphicProgram::Create(*post_vertexShader, *post_fragmentShader);
+	auto tonemap_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
+	auto tonemap_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-tonemapping.glsl");
+	auto tonemap_program = GraphicProgram::Create(*tonemap_vertexShader, *tonemap_fragmentShader);
+
+	auto denoise_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
+	auto denoise_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-denoise.glsl");
+	auto denoise_program = GraphicProgram::Create(*denoise_vertexShader, *denoise_fragmentShader);
 
 	std::vector<GLfloat> vertexBufferData = {
 		-1, -1, 1, -1, 1, 1, 1, 1, -1, 1, -1, -1
@@ -74,13 +81,16 @@ int main() {
 
 	std::vector<SphereGeometry> spheres;
 	spheres.push_back(SphereGeometry(vec3(0, 0, -7), 1));
-	spheres.push_back(SphereGeometry(vec3(3, 2, -15), 3));
+	spheres.back().emission = vec3(1.5, 2.5, 5.0) * 1.5f;
+	spheres.push_back(SphereGeometry(vec3(3, 2, -12), 3));
 	spheres.push_back(SphereGeometry(vec3(-2, 0, -8), 1));
 	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
 
 	std::vector<TriangleGeometry> triangles;
-	triangles.push_back(TriangleGeometry(vec3(-50, -1, 5), vec3(50, -1, 5), vec3(50, -1, -200)));
-	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
+//	triangles.push_back(TriangleGeometry(vec3(-50, -1, 5), vec3(50, -1, 5), vec3(50, -1, -200)));
+//	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
+	triangles.push_back(TriangleGeometry(vec3(-50, -50, -8), vec3(50, -50, -8), vec3(50, 50, -8)));
+	triangles.push_back(TriangleGeometry(vec3(50, 50, -8), vec3(-50, 50, -8), vec3(-50, -50, -8)));
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
 	auto timePoint = std::chrono::high_resolution_clock::now();
@@ -96,25 +106,32 @@ int main() {
 	} FrameBuffer::unbind();
 
 	msaa_fbo->bind(); {
-		post_program->clear();
-		post_program->start();
-		rt_fbo->activate(0, 0);
-		postVertexArray->render();
-		post_program->finish();
-	} FrameBuffer::unbind();
-
-	{
 		msaa_program->clear();
 		msaa_program->start();
 
 		spheresSsbo->bind();
 		trianglessSsbo->bind();
-		msaa_fbo->activate(0, 0);
+		rt_fbo->activate(0, 0);
 		postVertexArray->render();
 
 		msaa_program->finish();
-	}
+	} FrameBuffer::unbind();
 
+//	tonemap_fbo->bind(); {
+		tonemap_program->clear();
+		tonemap_program->start();
+		msaa_fbo->activate(0, 0);
+		postVertexArray->render();
+		tonemap_program->finish();
+//	} FrameBuffer::unbind();
+	
+/*	{
+		denoise_program->clear();
+		denoise_program->start();
+		tonemap_fbo->activate(0, 0);
+		postVertexArray->render();
+		denoise_program->finish();
+	}*/
 	window->swap();
 
 	auto duration = std::chrono::high_resolution_clock::now() - timePoint;

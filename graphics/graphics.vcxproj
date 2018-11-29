@@ -151,6 +151,7 @@
     <None Include="shaders\fragment-rt-adaptive-msaa.glsl" />
     <None Include="shaders\fragment-rt.glsl" />
     <None Include="shaders\fragment-texture.glsl" />
+    <None Include="shaders\fragment-tonemapping.glsl" />
     <None Include="shaders\math.glsl" />
     <None Include="shaders\rt-algorithm.glsl" />
     <None Include="shaders\rt-data.glsl" />

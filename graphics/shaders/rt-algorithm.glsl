@@ -1,7 +1,7 @@
 
 #extension GL_ARB_shading_language_include : require
 
-vec3 ray_direction (vec2 fragCoord) {
+vec3 ray_direction(vec2 fragCoord) {
 	vec3 origin = vec3(0);
 	vec2 d = fragCoord / vec2(camera.width, camera.height) * 2.0 - 1.0;
 	return normalize(vec3(d.x, d.y / camera.width * camera.height, -camera.focalLength));
@@ -17,7 +17,7 @@ hit sphere_hit(sphere_data s, vec3 origin, vec3 direction) {
 		q.x = q.y;
 		if (q.x < 0) return createHit(vec3(0), 1e+38);
 	}
-	return createHit(normalize(origin + direction * q.x - s.position), q.x);
+	return createHit(normalize(origin + direction * q.x - s.position), q.x, s.emission);
 }
 
 hit triangle_hit(triangle_data tri, vec3 origin, vec3 direction) {
@@ -47,10 +47,12 @@ vec3 ray_trace(vec3 direction) {
 	float d = 1e+38;
 	vec3 normal;
 	vec3 camera_position = vec3(0);
+	vec3 d_emission = vec3(0);
 	for (int i = 0; i < spheres.length(); ++i) {
 		hit h = sphere_hit(spheres[i], camera_position, direction);
 		if (h.d < d) {
 			d = h.d;
+			d_emission = h.emission;
 			normal = h.normal;
 		}
 	}
@@ -58,42 +60,45 @@ vec3 ray_trace(vec3 direction) {
 		hit h = triangle_hit(triangles[i], camera_position, direction);
 		if (h.d < d) {
 			d = h.d;
+			d_emission = h.emission;
 			normal = h.normal;
 		}
 	}
 
 	if (d == 1e+38) {
-		return vec3(1);
+		return d_emission;
 	}
 
 	vec3 hit_position = camera_position + direction * d;
-	float intensity = 0;
+	vec3 intensity = vec3(0);
 	vec3 n_d = hit_position;
-	int iterations = 512;
+	int iterations = 320;
 	for (int i = 0; i < iterations; ++i) {
+		vec3 r_emission = vec3(0);
 		bool s_hit = false;
 
 		n_d = normalize(_random(n_d));
 		if (dot(n_d, normal) < 0) n_d = -n_d;
-		if (n_d.y < 0) continue;
-
+		
+		float r_d = 1e+38;
 		for (int i = 0; i < spheres.length(); ++i) {
 			hit h = sphere_hit(spheres[i], hit_position + n_d * EPSILON, n_d);
-			if (h.d < 1e+38) {
-				s_hit = true;
-				break;
+			if (h.d < r_d) {
+				r_d = h.d;
+				r_emission = h.emission;
 			}
 		}
-		if (!s_hit)
 		for (int i = 0; i < triangles.length(); ++i) {
 			hit h = triangle_hit(triangles[i], hit_position + n_d * EPSILON, n_d);
-			if (h.d < 1e+38) {
-				s_hit = true;
-				break;
+			if (h.d < r_d) {
+				r_d = h.d;
+				r_emission = h.emission;
 			}
 		}
-		if (!s_hit)
-			intensity += 1.0;
+		if (r_d >= 1e+38) {
+			r_emission = vec3(0);
+		}
+		intensity += r_emission;
 	}
-	return vec3(intensity / iterations);
+	return d_emission + (intensity / iterations);
 }

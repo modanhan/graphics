@@ -70,5 +70,8 @@
     <None Include="shaders\fragment-texture.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\fragment-tonemapping.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

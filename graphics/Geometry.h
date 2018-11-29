@@ -18,10 +18,11 @@ namespace RayTracing {
 		float length;
 	};
 
-#pragma pack(1)
 	struct SphereGeometry {
 	public:
 		glm::vec3 position;
+		float p0;
+		glm::vec3 emission;
 		float radius;
 
 		SphereGeometry(glm::vec3 position, float radius)
@@ -32,7 +33,6 @@ namespace RayTracing {
 		~SphereGeometry() = default;
 	};
 
-#pragma pack(1)
 	struct TriangleGeometry {
 	public:
 		glm::vec3 v0;

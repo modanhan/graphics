@@ -84,6 +84,7 @@ std::unique_ptr<Shader> Shader::Create(GLenum type, std::vector<std::string> fil
 	}
 	glShaderSource(shader->shader, 1, sources.data(), sourceLengths.data());
 	glCompileShader(shader->shader);
+
 	GLint status;
 	glGetShaderiv(shader->shader, GL_COMPILE_STATUS, &status);
 	if (status == GL_FALSE) {
@@ -95,6 +96,7 @@ std::unique_ptr<Shader> Shader::Create(GLenum type, std::vector<std::string> fil
 		std::cout << info << std::endl;
 		return nullptr;
 	}
+
 	return shader;
 }
 
