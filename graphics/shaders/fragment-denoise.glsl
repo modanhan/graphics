@@ -9,7 +9,7 @@ layout(location = 0) out vec4 FragmentColour;
 
 uniform sampler2D ColourTexture;
 
-float exponent = 16;
+float exponent = 32;
 
 void main(void)
 {

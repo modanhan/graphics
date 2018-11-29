@@ -25,7 +25,12 @@ constexpr int HEIGHT = 720;
 int main() {
 	auto window = Window::Create(WIDTH, HEIGHT);
 	auto rt_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex.glsl");
-	auto rt_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-rt.glsl");
+	auto rt_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, std::vector<std::string>{
+		"shaders/fragment-rt.glsl",
+		"shaders/math.glsl",
+		"shaders/rt-data.glsl",
+		"shaders/rt-algorithm.glsl"
+		});
 	auto rt_program = GraphicProgram::Create(*rt_vertexShader, *rt_fragmentShader);
 
 	auto rt_fbo = FrameBuffer::Builder()
@@ -33,7 +38,12 @@ int main() {
 		.build();
 
 	auto msaa_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
-	auto msaa_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-rt-adaptive-msaa.glsl");
+	auto msaa_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, std::vector<std::string>{
+		"shaders/fragment-rt-adaptive-msaa.glsl",
+		"shaders/math.glsl",
+		"shaders/rt-data.glsl",
+		"shaders/rt-algorithm.glsl"
+	});
 	auto msaa_program = GraphicProgram::Create(*msaa_vertexShader, *msaa_fragmentShader);
 
 	auto msaa_fbo = FrameBuffer::Builder()
@@ -73,6 +83,7 @@ int main() {
 	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
+	auto timePoint = std::chrono::high_resolution_clock::now();
 	rt_fbo->bind(); {
 		rt_program->clear();
 		rt_program->start();
@@ -104,10 +115,10 @@ int main() {
 		msaa_program->finish();
 	}
 
-	auto timePoint = std::chrono::high_resolution_clock::now();
 	window->swap();
+
 	auto duration = std::chrono::high_resolution_clock::now() - timePoint;
-	printf("us:\t%u\n", std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
+	printf("Rendering runtime us:\t%u\n", std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
 
 	while (!window->shouldClose()) {
 		glfwPollEvents();

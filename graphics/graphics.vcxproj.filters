@@ -43,9 +43,6 @@
     <ResourceCompile Include="graphics.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\fragment.glsl">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="shaders\vertex.glsl">
       <Filter>Shaders</Filter>
     </None>
@@ -55,16 +52,22 @@
     <None Include="shaders\fragment-denoise.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\fragment-deferred-rt.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\fragment-deferred-shade.glsl">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="shaders\fragment-rt.glsl">
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\fragment-rt-adaptive-msaa.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\rt-data.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\rt-algorithm.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\math.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\fragment-texture.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

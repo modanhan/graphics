@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
@@ -20,6 +21,7 @@ class Shader {
 public:
 	GLuint shader = 0;
 	static std::unique_ptr<Shader> Create(GLenum type, std::string filename);
+	static std::unique_ptr<Shader> Create(GLenum type, std::vector<std::string> files);
 	~Shader();
 };
 

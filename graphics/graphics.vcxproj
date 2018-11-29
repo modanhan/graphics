@@ -147,12 +147,13 @@
     <ResourceCompile Include="graphics.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\fragment-deferred-rt.glsl" />
-    <None Include="shaders\fragment-deferred-shade.glsl" />
     <None Include="shaders\fragment-denoise.glsl" />
     <None Include="shaders\fragment-rt-adaptive-msaa.glsl" />
     <None Include="shaders\fragment-rt.glsl" />
-    <None Include="shaders\fragment.glsl" />
+    <None Include="shaders\fragment-texture.glsl" />
+    <None Include="shaders\math.glsl" />
+    <None Include="shaders\rt-algorithm.glsl" />
+    <None Include="shaders\rt-data.glsl" />
     <None Include="shaders\vertex-uv.glsl" />
     <None Include="shaders\vertex.glsl" />
   </ItemGroup>
