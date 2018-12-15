@@ -126,6 +126,7 @@
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GraphicProgram.cpp" />
+    <ClCompile Include="hemisphere_vector_set.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ShaderStorageBuffer.cpp" />
     <ClCompile Include="ShaderTools.cpp" />
@@ -137,6 +138,7 @@
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="GraphicProgram.h" />
+    <ClInclude Include="hemisphere_vector_set.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ShaderStorageBuffer.h" />
     <ClInclude Include="Texture.h" />

@@ -15,6 +15,7 @@
 #include "Geometry.h"
 #include "ShaderStorageBuffer.h"
 #include "FrameBuffer.h"
+#include "hemisphere_vector_set.h"
 
 using namespace RayTracing;
 using namespace glm;
@@ -87,11 +88,15 @@ int main() {
 	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
 
 	std::vector<TriangleGeometry> triangles;
-//	triangles.push_back(TriangleGeometry(vec3(-50, -1, 5), vec3(50, -1, 5), vec3(50, -1, -200)));
-//	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
-	triangles.push_back(TriangleGeometry(vec3(-50, -50, -8), vec3(50, -50, -8), vec3(50, 50, -8)));
-	triangles.push_back(TriangleGeometry(vec3(50, 50, -8), vec3(-50, 50, -8), vec3(-50, -50, -8)));
+	triangles.push_back(TriangleGeometry(vec3(-50, -1, 5), vec3(50, -1, 5), vec3(50, -1, -200)));
+	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
+//	triangles.push_back(TriangleGeometry(vec3(-50, -50, -8), vec3(50, -50, -8), vec3(50, 50, -8)));
+//	triangles.push_back(TriangleGeometry(vec3(50, 50, -8), vec3(-50, 50, -8), vec3(-50, -50, -8)));
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
+
+	auto ray_vec3sSsbo = ShaderStorageBuffer::Create(
+		sizeof(hemisphere_vector_set[0]) * hemisphere_vector_set.size(), hemisphere_vector_set.data(), GL_DYNAMIC_COPY, 3
+	);
 
 	auto timePoint = std::chrono::high_resolution_clock::now();
 	rt_fbo->bind(); {

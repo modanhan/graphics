@@ -69,15 +69,17 @@ vec3 ray_trace(vec3 direction) {
 		return d_emission;
 	}
 
+
 	vec3 hit_position = camera_position + direction * d;
 	vec3 intensity = vec3(0);
-	vec3 n_d = hit_position;
-	int iterations = 320;
-	for (int i = 0; i < iterations; ++i) {
+
+	float fv = _random(gl_FragCoord.xyz).z;
+	mat3 fragment_random_ray = mat3(1);
+	for (int i = 0; i < ray_vec3s.length(); ++i) {
 		vec3 r_emission = vec3(0);
 		bool s_hit = false;
 
-		n_d = normalize(_random(n_d));
+		vec3 n_d = fragment_random_ray * ray_vec3s[i];
 		if (dot(n_d, normal) < 0) n_d = -n_d;
 		
 		float r_d = 1e+38;
@@ -100,5 +102,5 @@ vec3 ray_trace(vec3 direction) {
 		}
 		intensity += r_emission;
 	}
-	return d_emission + (intensity / iterations);
+	return d_emission + (intensity / ray_vec3s.length());
 }

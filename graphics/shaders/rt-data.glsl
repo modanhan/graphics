@@ -22,6 +22,7 @@ struct triangle_data {
 layout(std430, binding = 0) buffer camera_buffer { camera_data camera; };
 layout(std430, binding = 1) buffer sphere_buffer { sphere_data[] spheres; };
 layout(std430, binding = 2) buffer triangle_buffer { triangle_data[] triangles; };
+layout(std430, binding = 3) buffer ray_vec3_buffer { vec3[] ray_vec3s; };
 
 struct hit {
 	vec3 normal;
