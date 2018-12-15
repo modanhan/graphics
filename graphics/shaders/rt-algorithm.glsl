@@ -69,9 +69,9 @@ vec3 ray_trace(vec3 direction) {
 		return d_emission;
 	}
 
-
 	vec3 hit_position = camera_position + direction * d;
 	vec3 intensity = vec3(0);
+	mat3 fragmentRandomRotate = mat3(rotationMatrix(_random(direction), _random(hit_position).x));
 
 	float fv = _random(gl_FragCoord.xyz).z;
 	mat3 fragment_random_ray = mat3(1);
@@ -80,6 +80,7 @@ vec3 ray_trace(vec3 direction) {
 		bool s_hit = false;
 
 		vec3 n_d = fragment_random_ray * ray_vec3s[i];
+		n_d = fragmentRandomRotate * n_d;
 		if (dot(n_d, normal) < 0) n_d = -n_d;
 		
 		float r_d = 1e+38;
