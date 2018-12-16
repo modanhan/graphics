@@ -1,49 +1,5 @@
 #include "FrameBuffer.h"
 
-
-/*
-std::unique_ptr<FrameBuffer> FrameBuffer::Create(int width, int height, int target) {
-	auto frameBuffer = std::unique_ptr<FrameBuffer>(new FrameBuffer());
-	frameBuffer->texture = Texture::CreateRGBA(width, height, nullptr);
-	glGenFramebuffers(1, &frameBuffer->fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->fbo);
-
-	glBindTexture(GL_TEXTURE_2D, frameBuffer->texture->texture);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + target, GL_TEXTURE_2D, frameBuffer->texture->texture, 0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	return frameBuffer;
-}
-
-std::unique_ptr<FrameBuffer> FrameBuffer::CreateDepth(int width, int height, int target) {
-	auto frameBuffer = std::unique_ptr<FrameBuffer>(new FrameBuffer());
-	frameBuffer->texture = Texture::CreateFloat(width, height, nullptr);
-	glGenFramebuffers(1, &frameBuffer->fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->fbo);
-
-	glBindTexture(GL_TEXTURE_2D, frameBuffer->texture->texture);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + target, GL_TEXTURE_2D, frameBuffer->texture->texture, 0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	return frameBuffer;
-}
-
-std::unique_ptr<FrameBuffer> FrameBuffer::CreateNormal(int width, int height, int target) {
-	auto frameBuffer = std::unique_ptr<FrameBuffer>(new FrameBuffer());
-	frameBuffer->texture = Texture::CreateNormal(width, height, nullptr);
-	glGenFramebuffers(1, &frameBuffer->fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->fbo);
-
-	glBindTexture(GL_TEXTURE_2D, frameBuffer->texture->texture);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + target, GL_TEXTURE_2D, frameBuffer->texture->texture, 0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	return frameBuffer;
-}
-*/
 int FrameBuffer::bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

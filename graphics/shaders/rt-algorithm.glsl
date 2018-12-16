@@ -71,7 +71,7 @@ vec3 ray_trace(vec3 direction) {
 
 	vec3 hit_position = camera_position + direction * d;
 	vec3 intensity = vec3(0);
-	mat3 fragmentRandomRotate = mat3(rotationMatrix(_random(direction), _random(hit_position).x));
+	mat3 fragmentRandomRotate = mat3(rotationMatrix(_random(direction), 2.0));
 
 	float fv = _random(gl_FragCoord.xyz).z;
 	mat3 fragment_random_ray = mat3(1);
