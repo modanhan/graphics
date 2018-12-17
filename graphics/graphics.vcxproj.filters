@@ -18,6 +18,7 @@
     <ClCompile Include="hemisphere_vector_set.cpp">
       <Filter>ray-tracing</Filter>
     </ClCompile>
+    <ClCompile Include="PostProcessing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicProgram.h" />
@@ -36,6 +37,7 @@
     <ClInclude Include="hemisphere_vector_set.h">
       <Filter>ray-tracing</Filter>
     </ClInclude>
+    <ClInclude Include="PostProcessing.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ray-tracing">
@@ -43,6 +45,9 @@
     </Filter>
     <Filter Include="Shaders">
       <UniqueIdentifier>{d6e1fce3-9b05-43a5-94fa-e2c49b4bf181}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="post-processing">
+      <UniqueIdentifier>{03431337-aed9-4f48-bb9d-edd187070771}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +82,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\fragment-tonemapping.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\fragment-gaussian.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

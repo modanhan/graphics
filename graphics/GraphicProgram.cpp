@@ -105,7 +105,7 @@ Shader::~Shader() {
 }
 
 std::unique_ptr<GraphicProgram> GraphicProgram::Create(const Shader& vertex, const Shader& fragment) {
-	auto graphicProgram = std::unique_ptr<GraphicProgram>(new GraphicProgram());
+	auto graphicProgram = std::unique_ptr<GraphicProgram>(new GraphicProgram);
 	graphicProgram->program = ShaderTools::LinkProgram(vertex.shader, fragment.shader);
 	return graphicProgram;
 }

@@ -15,6 +15,7 @@
 #include "Geometry.h"
 #include "ShaderStorageBuffer.h"
 #include "FrameBuffer.h"
+#include "PostProcessing.h"
 #include "hemisphere_vector_set.h"
 
 using namespace RayTracing;
@@ -58,9 +59,7 @@ int main() {
 	auto tonemap_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-tonemapping.glsl");
 	auto tonemap_program = GraphicProgram::Create(*tonemap_vertexShader, *tonemap_fragmentShader);
 
-	auto denoise_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
-	auto denoise_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-denoise.glsl");
-	auto denoise_program = GraphicProgram::Create(*denoise_vertexShader, *denoise_fragmentShader);
+	auto denoise = DenoisePostProcessing::Create(WIDTH, HEIGHT);
 
 	std::vector<GLfloat> vertexBufferData = {
 		-1, -1, 1, -1, 1, 1, 1, 1, -1, 1, -1, -1
@@ -122,21 +121,19 @@ int main() {
 		msaa_program->finish();
 	} FrameBuffer::unbind();
 
-//	tonemap_fbo->bind(); {
+	denoise->bind(); {
+		//	tonemap_fbo->bind(); {
 		tonemap_program->clear();
 		tonemap_program->start();
 		msaa_fbo->activate(0, 0);
 		postVertexArray->render();
 		tonemap_program->finish();
-//	} FrameBuffer::unbind();
+	} FrameBuffer::unbind();
+
+	{
+		denoise->use();
+	}
 	
-/*	{
-		denoise_program->clear();
-		denoise_program->start();
-		tonemap_fbo->activate(0, 0);
-		postVertexArray->render();
-		denoise_program->finish();
-	}*/
 	window->swap();
 
 	auto duration = std::chrono::high_resolution_clock::now() - timePoint;

@@ -128,6 +128,7 @@
     <ClCompile Include="GraphicProgram.cpp" />
     <ClCompile Include="hemisphere_vector_set.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PostProcessing.cpp" />
     <ClCompile Include="ShaderStorageBuffer.cpp" />
     <ClCompile Include="ShaderTools.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="GraphicProgram.h" />
     <ClInclude Include="hemisphere_vector_set.h" />
+    <ClInclude Include="PostProcessing.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ShaderStorageBuffer.h" />
     <ClInclude Include="Texture.h" />
@@ -150,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\fragment-denoise.glsl" />
+    <None Include="shaders\fragment-gaussian.glsl" />
     <None Include="shaders\fragment-rt-adaptive-msaa.glsl" />
     <None Include="shaders\fragment-rt.glsl" />
     <None Include="shaders\fragment-texture.glsl" />
