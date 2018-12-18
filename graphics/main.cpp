@@ -55,11 +55,9 @@ int main() {
 		.addColorAttachment(0, Texture::CreateRGBA(WIDTH, HEIGHT, 0))
 		.build();
 
-	auto tonemap_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
-	auto tonemap_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, "shaders/fragment-tonemapping.glsl");
-	auto tonemap_program = GraphicProgram::Create(*tonemap_vertexShader, *tonemap_fragmentShader);
-
 	auto denoise = DenoisePostProcessing::Create(WIDTH, HEIGHT);
+	auto bloom = BloomPostProcessing::Create(WIDTH, HEIGHT);
+	auto tonemapping = ToneMappingPostProcessing::Create(WIDTH, HEIGHT);
 
 	std::vector<GLfloat> vertexBufferData = {
 		-1, -1, 1, -1, 1, 1, 1, 1, -1, 1, -1, -1
@@ -109,7 +107,7 @@ int main() {
 		rt_program->finish();
 	} FrameBuffer::unbind();
 
-	msaa_fbo->bind(); {
+	bloom->bind(); {
 		msaa_program->clear();
 		msaa_program->start();
 
@@ -121,8 +119,15 @@ int main() {
 		msaa_program->finish();
 	} FrameBuffer::unbind();
 
-	denoise->bind(); {
-		//	tonemap_fbo->bind(); {
+	tonemapping->bind(); {
+		bloom->use();
+	} FrameBuffer::unbind();
+
+	{
+		tonemapping->use();
+	}
+
+/*	denoise->bind(); {
 		tonemap_program->clear();
 		tonemap_program->start();
 		msaa_fbo->activate(0, 0);
@@ -132,7 +137,7 @@ int main() {
 
 	{
 		denoise->use();
-	}
+	}*/
 	
 	window->swap();
 
