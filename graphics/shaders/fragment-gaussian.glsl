@@ -7,8 +7,6 @@ layout(location = 0) out vec4 FragmentColour;
 uniform sampler2D ColourTexture;
 layout(location = 1) uniform vec2 direction;
 
-float exponent = 32;
-
 void main(void)
 {
 	vec4 color = vec4(0.0);

@@ -4,25 +4,20 @@ in vec2 UV;
 
 layout(location = 0) out vec4 FragmentColour;
 
-uniform sampler2D ColourTexture;
-uniform sampler2D AddColourTexture;
-layout(location = 1) uniform vec2 direction;
+layout(binding = 0) uniform sampler2D AddColourTexture;
+layout(binding = 1) uniform sampler2D ColourTexture;
 
-float exponent = 32;
+vec4 SampleBox() {
+	vec2 size = 1.0 / textureSize(ColourTexture, 0);
+	vec4 o; o.xy = size * -1; o.zw = size;
+	return (texture2D(ColourTexture, UV + o.xy) + texture2D(ColourTexture, UV + o.zy)
+	+ texture2D(ColourTexture, UV + o.xw) + texture2D(ColourTexture, UV + o.zw))
+	* 0.25;
+}
 
 void main(void)
 {
 	vec4 color = vec4(0.0);
-	vec2 size = 1.0 / textureSize(ColourTexture, 0);
-	vec4 total = vec4(0.0);
-	vec2 position = direction * -3.0 * size;
-	total += texture2D(ColourTexture, UV + position + direction * 0 * size) * 0.00598;
-	total += texture2D(ColourTexture, UV + position + direction * 1 * size) * 0.060626;
-	total += texture2D(ColourTexture, UV + position + direction * 2 * size) * 0.241843;
-	total += texture2D(ColourTexture, UV + position + direction * 3 * size) * 0.383103;
-	total += texture2D(ColourTexture, UV + position + direction * 4 * size) * 0.241843;
-	total += texture2D(ColourTexture, UV + position + direction * 5 * size) * 0.060626;
-	total += texture2D(ColourTexture, UV + position + direction * 6 * size) * 0.00598;
-	total.w = 1.0;
+	vec4 total = SampleBox();
 	FragmentColour = (total + texture2D(AddColourTexture, UV)) * 0.5;
 }

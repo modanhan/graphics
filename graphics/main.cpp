@@ -119,26 +119,14 @@ int main() {
 		msaa_program->finish();
 	} FrameBuffer::unbind();
 
-	tonemapping->bind(); {
-		bloom->use();
+	{
+		bloom->use(*(tonemapping->frameBuffer));
 	} FrameBuffer::unbind();
 
 	{
 		tonemapping->use();
 	}
 
-/*	denoise->bind(); {
-		tonemap_program->clear();
-		tonemap_program->start();
-		msaa_fbo->activate(0, 0);
-		postVertexArray->render();
-		tonemap_program->finish();
-	} FrameBuffer::unbind();
-
-	{
-		denoise->use();
-	}*/
-	
 	window->swap();
 
 	auto duration = std::chrono::high_resolution_clock::now() - timePoint;

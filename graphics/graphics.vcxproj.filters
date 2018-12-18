@@ -87,5 +87,11 @@
     <None Include="shaders\fragment-gaussian.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\fragment-gaussian-add.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\fragment-lerp.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@ class FrameBuffer
 	GLuint fbo;
 	std::map<int, std::unique_ptr<Texture>> colorAttachments;
 public:
-	int bind();
+	int bind() const;
 	static int unbind() {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		return 0;

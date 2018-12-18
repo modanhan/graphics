@@ -52,9 +52,9 @@ std::unique_ptr<Texture> Texture::CreateHDR(GLsizei width, GLsizei height, const
 }
 
 int Texture::activate(int target) {
-	glUniform1i(target, target);
 	glActiveTexture(GL_TEXTURE0 + target);
 	glBindTexture(GL_TEXTURE_2D, texture);
+	glUniform1i(target, target);
 	// return -1 if glGetError
 	return 0;
 }

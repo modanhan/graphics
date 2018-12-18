@@ -152,7 +152,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\fragment-denoise.glsl" />
+    <None Include="shaders\fragment-gaussian-add.glsl" />
     <None Include="shaders\fragment-gaussian.glsl" />
+    <None Include="shaders\fragment-lerp.glsl" />
     <None Include="shaders\fragment-rt-adaptive-msaa.glsl" />
     <None Include="shaders\fragment-rt.glsl" />
     <None Include="shaders\fragment-texture.glsl" />
