@@ -101,6 +101,7 @@ public:
 			.addBuffer(0, 2, vertexBufferData)
 			.addBuffer(1, 2, vertexUVBufferData)
 			.build(6);
+		int iteration_count = 8;
 		do {
 			bloom->frameBuffers.push_back(FrameBuffer::Builder()
 				.addColorAttachment(0, Texture::CreateHDR(width, height, 0))
@@ -112,7 +113,10 @@ public:
 				.addColorAttachment(0, Texture::CreateHDR(width, height, 0))
 				.build()
 			);
-		} while (width > 4 && height > 4);
+			if (width < 4 || height < 4) break;
+			iteration_count--;
+			if (!iteration_count)break;
+		} while (1);
 		return bloom;
 	}
 

@@ -78,8 +78,8 @@ int main() {
 	auto cameraSsbo = ShaderStorageBuffer::Create(sizeof(Camera), &camera, GL_DYNAMIC_COPY, 0);
 
 	std::vector<SphereGeometry> spheres;
-	spheres.push_back(SphereGeometry(vec3(0, 0, -7), 1));
-	spheres.back().emission = vec3(1.5, 2.5, 5.0) * 1.5f;
+	spheres.push_back(SphereGeometry(vec3(0, 0, -15), 1));
+	spheres.back().emission = vec3(1.5, 2.5, 5.0) * 12.5f;
 	spheres.push_back(SphereGeometry(vec3(3, 2, -12), 3));
 	spheres.push_back(SphereGeometry(vec3(-2, 0, -8), 1));
 	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
@@ -107,6 +107,8 @@ int main() {
 		rt_program->finish();
 	} FrameBuffer::unbind();
 
+	// caveat: runtime is unpredictable if image is noisy that msaa trigger on many fragments
+	// this can happen with diffuse surfaces interacting with high intensity emisssion
 	bloom->bind(); {
 		msaa_program->clear();
 		msaa_program->start();
