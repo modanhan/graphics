@@ -5,6 +5,7 @@ in vec2 UV;
 layout(location = 0) out vec4 FragmentColour;
 
 uniform sampler2D ColourTexture;
+uniform sampler2D AddColourTexture;
 layout(location = 1) uniform vec2 direction;
 
 float exponent = 32;
@@ -23,5 +24,5 @@ void main(void)
 	total += texture2D(ColourTexture, UV + position + direction * 5 * size) * 0.060626;
 	total += texture2D(ColourTexture, UV + position + direction * 6 * size) * 0.00598;
 	total.w = 1.0;
-	FragmentColour = total;
+	FragmentColour = (total + texture2D(AddColourTexture, UV)) * 0.5;
 }
