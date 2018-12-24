@@ -18,11 +18,15 @@ public:
 
 class Shader {
 	Shader() = default;
-public:
 	GLuint shader = 0;
+public:
 	static std::unique_ptr<Shader> Create(GLenum type, std::string filename);
 	static std::unique_ptr<Shader> Create(GLenum type, std::vector<std::string> files);
 	~Shader();
+
+	operator GLuint() const {
+		return shader;
+	}
 };
 
 class Program {
@@ -37,7 +41,7 @@ public:
 	int start();
 	int finish();
 
-	operator GLuint&() {
+	operator GLuint() const {
 		return program;
 	}
 };

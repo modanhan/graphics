@@ -61,22 +61,22 @@ private:
 	GLsizei width;
 	GLsizei height;
 	std::unique_ptr<Shader> vertexShader;
-	std::unique_ptr<Shader> fragmentShader;
+	std::unique_ptr<Shader> gaussianFragmentShader;
 	std::unique_ptr<Shader> addFragmentShader;
 	std::unique_ptr<Shader> lerpFragmentShader;
-	std::unique_ptr<Program> program;
+	std::unique_ptr<Program> gaussianProgram;
 	std::unique_ptr<Program> addProgram;
 	std::unique_ptr<Program> lerpProgram;
 	std::unique_ptr<VertexArray> postVertexArray;
-	std::vector<std::unique_ptr<FrameBuffer>> frameBuffers;
-	std::vector<std::unique_ptr<FrameBuffer>> frameBuffersV;
+	std::vector<std::unique_ptr<FrameBuffer>> frameBuffers_horizontal;
+	std::vector<std::unique_ptr<FrameBuffer>> frameBuffers_vertical;
 public:
 	static std::unique_ptr<BloomPostProcessing> Create(GLsizei width, GLsizei height) {
 		auto bloom = std::unique_ptr<BloomPostProcessing>(new BloomPostProcessing);
 		bloom->width = width;
 		bloom->height = height;
 		bloom->vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
-		bloom->fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, std::vector<std::string>{
+		bloom->gaussianFragmentShader = Shader::Create(GL_FRAGMENT_SHADER, std::vector<std::string>{
 			"shaders/fragment-gaussian.glsl"
 		});
 		bloom->addFragmentShader = Shader::Create(GL_FRAGMENT_SHADER, std::vector<std::string>{
@@ -85,7 +85,7 @@ public:
 		bloom->lerpFragmentShader = Shader::Create(GL_FRAGMENT_SHADER, std::vector<std::string>{
 			"shaders/fragment-lerp.glsl"
 		});
-		bloom->program = Program::CreateGraphic(*bloom->vertexShader, *bloom->fragmentShader);
+		bloom->gaussianProgram = Program::CreateGraphic(*bloom->vertexShader, *bloom->gaussianFragmentShader);
 		bloom->addProgram = Program::CreateGraphic(*bloom->vertexShader, *bloom->addFragmentShader);
 		bloom->lerpProgram = Program::CreateGraphic(*bloom->vertexShader, *bloom->lerpFragmentShader);
 		bloom->frameBuffer = FrameBuffer::Builder()
@@ -101,15 +101,15 @@ public:
 			.addBuffer(0, 2, vertexBufferData)
 			.addBuffer(1, 2, vertexUVBufferData)
 			.build(6);
-		int iteration_count = 8;
+		int iteration_count = 12;
 		do {
-			bloom->frameBuffers.push_back(FrameBuffer::Builder()
+			bloom->frameBuffers_horizontal.push_back(FrameBuffer::Builder()
 				.addColorAttachment(0, Texture::CreateHDR(width, height, 0))
 				.build()
 			);
 			width >>= 1;
 			height >>= 1;
-			bloom->frameBuffersV.push_back(FrameBuffer::Builder()
+			bloom->frameBuffers_vertical.push_back(FrameBuffer::Builder()
 				.addColorAttachment(0, Texture::CreateHDR(width, height, 0))
 				.build()
 			);
@@ -121,33 +121,33 @@ public:
 	}
 
 	void use(const FrameBuffer& externalFrameBuffer) {
-		for (unsigned int i = 0; i < frameBuffers.size(); ++i) {
-			frameBuffers[i]->bind();
-			program->clear();
-			program->start();
+		for (unsigned int i = 0; i < frameBuffers_horizontal.size(); ++i) {
+			frameBuffers_horizontal[i]->bind();
+			gaussianProgram->clear();
+			gaussianProgram->start();
 			glUniform2f(1, 1.0, 0.0);
 			glViewport(0, 0, width >> (i), height >> (i));
-			(i > 0 ? frameBuffersV[i - 1] : frameBuffer)->activate(0, 0);
+			(i > 0 ? frameBuffers_vertical[i - 1] : frameBuffer)->activate(0, 0);
 			postVertexArray->render();
-			program->finish();
+			gaussianProgram->finish();
 
-			frameBuffersV[i]->bind();
-			program->clear();
-			program->start();
+			frameBuffers_vertical[i]->bind();
+			gaussianProgram->clear();
+			gaussianProgram->start();
 			glUniform2f(1, 0.0, 1.0);
 			glViewport(0, 0, width >> (i + 1), height >> (i + 1));
-			frameBuffers[i]->activate(0, 0);
+			frameBuffers_horizontal[i]->activate(0, 0);
 			postVertexArray->render();
-			program->finish();
+			gaussianProgram->finish();
 		}
 
-		for (int i = frameBuffers.size() - 2; i >= 0; --i) {
-			frameBuffers[i]->bind();
+		for (int i = frameBuffers_horizontal.size() - 2; i >= 0; --i) {
+			frameBuffers_horizontal[i]->bind();
 			addProgram->clear();
 			addProgram->start();
 			glViewport(0, 0, width >> i, height >> i);
-			frameBuffersV[i]->activate(0, 0);
-			((i == frameBuffers.size() - 2) ? frameBuffersV[i] : frameBuffers[i + 1])->activate(0, 1);
+			frameBuffers_vertical[i]->activate(0, 0);
+			((i == frameBuffers_horizontal.size() - 2) ? frameBuffers_vertical[i] : frameBuffers_horizontal[i + 1])->activate(0, 1);
 			postVertexArray->render();
 			addProgram->finish();
 		}
@@ -164,7 +164,7 @@ public:
 		lerpProgram->clear();
 		lerpProgram->start();
 		glViewport(0, 0, width, height);
-		frameBuffers.front()->activate(0, 0);
+		frameBuffers_horizontal.front()->activate(0, 0);
 		frameBuffer->activate(0, 1);
 		postVertexArray->render();
 		lerpProgram->finish();

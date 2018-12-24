@@ -106,13 +106,13 @@ Shader::~Shader() {
 
 std::unique_ptr<Program> Program::CreateGraphic(const Shader& vertex, const Shader& fragment) {
 	auto graphicProgram = std::unique_ptr<Program>(new Program);
-	graphicProgram->program = ShaderTools::LinkProgram(vertex.shader, fragment.shader);
+	graphicProgram->program = ShaderTools::LinkProgram(vertex, fragment);
 	return graphicProgram;
 }
 
 std::unique_ptr<Program> Program::CreateCompute(const Shader& shader) {
 	auto program = std::unique_ptr<Program>(new Program);
-	glAttachShader(*program, shader.shader);
+	glAttachShader(*program, shader);
 	glLinkProgram(*program);
 	{
 		GLint status;
@@ -124,6 +124,7 @@ std::unique_ptr<Program> Program::CreateCompute(const Shader& shader) {
 			glGetProgramInfoLog(*program, info.length(), &length, &info[0]);
 			std::cout << "ERROR linking shader program:" << std::endl;
 			std::cout << info << std::endl;
+			return nullptr;
 		}
 	}
 	return program;

@@ -79,7 +79,7 @@ int main() {
 
 	std::vector<SphereGeometry> spheres;
 	spheres.push_back(SphereGeometry(vec3(0, 0, -10), 1));
-	spheres.back().emission = vec3(0.25, 0.5, 1.0) * 4.5f;
+	spheres.back().emission = vec3(0.25, 0.5, 1.0) * 6.5f;
 	spheres.push_back(SphereGeometry(vec3(3, 2, -12), 3));
 	spheres.push_back(SphereGeometry(vec3(-2, 0, -8), 1));
 	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
