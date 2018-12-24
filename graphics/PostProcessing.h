@@ -21,7 +21,7 @@ class DenoisePostProcessing : public PostProcessing {
 private:
 	std::unique_ptr<Shader> vertexShader;
 	std::unique_ptr<Shader> fragmentShader;
-	std::unique_ptr<GraphicProgram> program;
+	std::unique_ptr<Program> program;
 	std::unique_ptr<VertexArray> postVertexArray;
 public:
 	static std::unique_ptr<DenoisePostProcessing> Create(GLsizei width, GLsizei height) {
@@ -30,7 +30,7 @@ public:
 		denoise->fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, std::vector<std::string>{
 			"shaders/fragment-denoise.glsl"
 		});
-		denoise->program = GraphicProgram::Create(*denoise->vertexShader, *denoise->fragmentShader);
+		denoise->program = Program::CreateGraphic(*denoise->vertexShader, *denoise->fragmentShader);
 		denoise->frameBuffer = FrameBuffer::Builder()
 			.addColorAttachment(0, Texture::CreateHDR(width, height, 0))
 			.build();
@@ -64,9 +64,9 @@ private:
 	std::unique_ptr<Shader> fragmentShader;
 	std::unique_ptr<Shader> addFragmentShader;
 	std::unique_ptr<Shader> lerpFragmentShader;
-	std::unique_ptr<GraphicProgram> program;
-	std::unique_ptr<GraphicProgram> addProgram;
-	std::unique_ptr<GraphicProgram> lerpProgram;
+	std::unique_ptr<Program> program;
+	std::unique_ptr<Program> addProgram;
+	std::unique_ptr<Program> lerpProgram;
 	std::unique_ptr<VertexArray> postVertexArray;
 	std::vector<std::unique_ptr<FrameBuffer>> frameBuffers;
 	std::vector<std::unique_ptr<FrameBuffer>> frameBuffersV;
@@ -85,9 +85,9 @@ public:
 		bloom->lerpFragmentShader = Shader::Create(GL_FRAGMENT_SHADER, std::vector<std::string>{
 			"shaders/fragment-lerp.glsl"
 		});
-		bloom->program = GraphicProgram::Create(*bloom->vertexShader, *bloom->fragmentShader);
-		bloom->addProgram = GraphicProgram::Create(*bloom->vertexShader, *bloom->addFragmentShader);
-		bloom->lerpProgram = GraphicProgram::Create(*bloom->vertexShader, *bloom->lerpFragmentShader);
+		bloom->program = Program::CreateGraphic(*bloom->vertexShader, *bloom->fragmentShader);
+		bloom->addProgram = Program::CreateGraphic(*bloom->vertexShader, *bloom->addFragmentShader);
+		bloom->lerpProgram = Program::CreateGraphic(*bloom->vertexShader, *bloom->lerpFragmentShader);
 		bloom->frameBuffer = FrameBuffer::Builder()
 			.addColorAttachment(0, Texture::CreateHDR(width, height, 0))
 			.build();
@@ -175,7 +175,7 @@ class ToneMappingPostProcessing : public PostProcessing {
 private:
 	std::unique_ptr<Shader> vertexShader;
 	std::unique_ptr<Shader> fragmentShader;
-	std::unique_ptr<GraphicProgram> program;
+	std::unique_ptr<Program> program;
 	std::unique_ptr<VertexArray> postVertexArray;
 public:
 	static std::unique_ptr<ToneMappingPostProcessing> Create(GLsizei width, GLsizei height) {
@@ -184,7 +184,7 @@ public:
 		toneMapping->fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, std::vector<std::string>{
 			"shaders/fragment-tonemapping.glsl"
 		});
-		toneMapping->program = GraphicProgram::Create(*toneMapping->vertexShader, *toneMapping->fragmentShader);
+		toneMapping->program = Program::CreateGraphic(*toneMapping->vertexShader, *toneMapping->fragmentShader);
 		toneMapping->frameBuffer = FrameBuffer::Builder()
 			.addColorAttachment(0, Texture::CreateHDR(width, height, 0))
 			.build();

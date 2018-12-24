@@ -25,15 +25,20 @@ public:
 	~Shader();
 };
 
-class GraphicProgram {
-	GraphicProgram() = default;
-public:
+class Program {
 	GLuint program = 0;
-	static std::unique_ptr<GraphicProgram> Create(const Shader& vertex, const Shader& fragment);
-	~GraphicProgram();
+	Program() = default;
+public:
+	static std::unique_ptr<Program> CreateGraphic(const Shader& vertex, const Shader& fragment);
+	static std::unique_ptr<Program> CreateCompute(const Shader& compute);
+	~Program();
 
 	int clear();
 	int start();
 	int finish();
+
+	operator GLuint&() {
+		return program;
+	}
 };
 

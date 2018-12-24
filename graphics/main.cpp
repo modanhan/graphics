@@ -33,7 +33,7 @@ int main() {
 		"shaders/rt-data.glsl",
 		"shaders/rt-algorithm.glsl"
 		});
-	auto rt_program = GraphicProgram::Create(*rt_vertexShader, *rt_fragmentShader);
+	auto rt_program = Program::CreateGraphic(*rt_vertexShader, *rt_fragmentShader);
 
 	auto rt_fbo = FrameBuffer::Builder()
 		.addColorAttachment(0, Texture::CreateHDR(WIDTH, HEIGHT, 0))
@@ -46,7 +46,7 @@ int main() {
 		"shaders/rt-data.glsl",
 		"shaders/rt-algorithm.glsl"
 	});
-	auto msaa_program = GraphicProgram::Create(*msaa_vertexShader, *msaa_fragmentShader);
+	auto msaa_program = Program::CreateGraphic(*msaa_vertexShader, *msaa_fragmentShader);
 
 	auto msaa_fbo = FrameBuffer::Builder()
 		.addColorAttachment(0, Texture::CreateHDR(WIDTH, HEIGHT, 0))
@@ -78,8 +78,8 @@ int main() {
 	auto cameraSsbo = ShaderStorageBuffer::Create(sizeof(Camera), &camera, GL_DYNAMIC_COPY, 0);
 
 	std::vector<SphereGeometry> spheres;
-	spheres.push_back(SphereGeometry(vec3(0, 0, -15), 1));
-	spheres.back().emission = vec3(1.5, 2.5, 5.0) * 12.5f;
+	spheres.push_back(SphereGeometry(vec3(0, 0, -10), 1));
+	spheres.back().emission = vec3(0.25, 0.5, 1.0) * 4.5f;
 	spheres.push_back(SphereGeometry(vec3(3, 2, -12), 3));
 	spheres.push_back(SphereGeometry(vec3(-2, 0, -8), 1));
 	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);

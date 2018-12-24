@@ -104,28 +104,47 @@ Shader::~Shader() {
 	glDeleteShader(shader);
 }
 
-std::unique_ptr<GraphicProgram> GraphicProgram::Create(const Shader& vertex, const Shader& fragment) {
-	auto graphicProgram = std::unique_ptr<GraphicProgram>(new GraphicProgram);
+std::unique_ptr<Program> Program::CreateGraphic(const Shader& vertex, const Shader& fragment) {
+	auto graphicProgram = std::unique_ptr<Program>(new Program);
 	graphicProgram->program = ShaderTools::LinkProgram(vertex.shader, fragment.shader);
 	return graphicProgram;
 }
 
-GraphicProgram::~GraphicProgram() {
+std::unique_ptr<Program> Program::CreateCompute(const Shader& shader) {
+	auto program = std::unique_ptr<Program>(new Program);
+	glAttachShader(*program, shader.shader);
+	glLinkProgram(*program);
+	{
+		GLint status;
+		glGetProgramiv(*program, GL_LINK_STATUS, &status);
+		if (status == GL_FALSE) {
+			GLint length;
+			glGetProgramiv(*program, GL_INFO_LOG_LENGTH, &length);
+			std::string info(length, ' ');
+			glGetProgramInfoLog(*program, info.length(), &length, &info[0]);
+			std::cout << "ERROR linking shader program:" << std::endl;
+			std::cout << info << std::endl;
+		}
+	}
+	return program;
+}
+
+Program::~Program() {
 	glDeleteProgram(program);
 }
 
-int GraphicProgram::clear() {
+int Program::clear() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	return 0;
 }
 
-int GraphicProgram::start() {
+int Program::start() {
 	glUseProgram(program);
 	return 0;
 }
 
-int GraphicProgram::finish() {
+int Program::finish() {
 	glUseProgram(0);
 	return 0;
 }
