@@ -95,7 +95,6 @@ int main() {
 		sizeof(hemisphere_vector_set[0]) * hemisphere_vector_set.size(), hemisphere_vector_set.data(), GL_DYNAMIC_COPY, 3
 	);
 
-	auto timePoint = std::chrono::high_resolution_clock::now();
 	rt_fbo->bind(); {
 		rt_program->clear();
 		rt_program->start();
@@ -130,9 +129,6 @@ int main() {
 	}
 
 	window->swap();
-
-	auto duration = std::chrono::high_resolution_clock::now() - timePoint;
-	printf("Rendering runtime us:\t%u\n", std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
 
 	while (!window->shouldClose()) {
 		glfwPollEvents();

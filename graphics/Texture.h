@@ -8,8 +8,8 @@
 class Texture
 {
 	Texture() = default;
-public:
 	GLuint texture;
+public:
 
 	~Texture();
 
@@ -17,5 +17,9 @@ public:
 	static std::unique_ptr<Texture> CreateFloat(GLsizei width, GLsizei height, const void* data);
 	static std::unique_ptr<Texture> CreateHDR(GLsizei width, GLsizei height, const void* data);
 	int activate(int target);
+
+	operator GLuint() const {
+		return texture;
+	}
 };
 
