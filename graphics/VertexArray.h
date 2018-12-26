@@ -8,8 +8,8 @@
 
 class VertexBuffer {
 	VertexBuffer() = default;
-public:
 	GLuint vbo;
+public:
 	static std::unique_ptr<VertexBuffer> Create(const std::vector<GLfloat>& data);
 	~VertexBuffer();
 };

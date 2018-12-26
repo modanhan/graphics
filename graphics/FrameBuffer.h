@@ -10,7 +10,7 @@
 class FrameBuffer
 {
 	FrameBuffer() = default;
-	GLuint frameBuffer;
+	GLuint fbo;
 	std::map<int, std::unique_ptr<Texture>> colorAttachments;
 public:
 	int bind() const;
@@ -27,8 +27,8 @@ public:
 	public:
 		Builder() {
 			frameBuffer = std::unique_ptr<FrameBuffer>(new FrameBuffer());
-			glGenFramebuffers(1, &frameBuffer->frameBuffer);
-			glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->frameBuffer);
+			glGenFramebuffers(1, &frameBuffer->fbo);
+			glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer->fbo);
 		}
 
 		Builder& addColorAttachment(int colorAttachment, std::unique_ptr<Texture> texture) {
@@ -57,7 +57,7 @@ public:
 	~FrameBuffer();
 
 	operator GLuint() const {
-		return frameBuffer;
+		return fbo;
 	}
 };
 
