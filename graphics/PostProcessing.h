@@ -113,7 +113,7 @@ public:
 				.addColorAttachment(0, Texture::CreateHDR(width, height, 0))
 				.build()
 			);
-			if (width < 4 || height < 4) break;
+			if (width < 2 || height < 2) break;
 			iteration_count--;
 			if (!iteration_count)break;
 		} while (1);
@@ -151,14 +151,6 @@ public:
 			postVertexArray->render();
 			addProgram->finish();
 		}
-	/*	frameBuffers.front()->bind();
-		addProgram->clear();
-		addProgram->start();
-		glViewport(0, 0, width, height);
-		frameBuffers[0]->activate(0, 0);
-		frameBuffers[0]->activate(0, 1);
-		postVertexArray->render();
-		addProgram->finish();*/
 
 		externalFrameBuffer.bind();
 		lerpProgram->clear();

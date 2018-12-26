@@ -78,10 +78,11 @@ int main() {
 	auto cameraSsbo = ShaderStorageBuffer::Create(sizeof(Camera), &camera, GL_DYNAMIC_COPY, 0);
 
 	std::vector<SphereGeometry> spheres;
-	spheres.push_back(SphereGeometry(vec3(0, 0, -10), 1));
-	spheres.back().emission = vec3(0.25, 0.5, 1.0) * 6.5f;
-	spheres.push_back(SphereGeometry(vec3(3, 2, -12), 3));
-	spheres.push_back(SphereGeometry(vec3(-2, 0, -8), 1));
+	spheres.push_back(SphereGeometry(vec3(-2.5, 0, -8), 1));
+	spheres.back().emission = vec3(01.5, 0.125, 0.25) * 12.5f;
+	spheres.push_back(SphereGeometry(vec3(0, 0, -9), 1));
+	spheres.push_back(SphereGeometry(vec3(2.5, 0, -8), 1));
+	spheres.back().emission = vec3(0.25, 0.75, 1.125) * 15.5f;
 	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
 
 	std::vector<TriangleGeometry> triangles;

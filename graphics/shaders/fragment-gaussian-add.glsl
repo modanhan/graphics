@@ -19,5 +19,7 @@ void main(void)
 {
 	vec4 color = vec4(0.0);
 	vec4 total = SampleBox();
-	FragmentColour = (total + texture2D(AddColourTexture, UV)) * 0.5;
+	// i don't understand the linear interpolation at 0.25 below, but it seems to look better than at 0.5.
+	// likely a bug somewhere, will work on later
+	FragmentColour = (total * 0.75 + texture2D(AddColourTexture, UV) * 0.25);
 }
