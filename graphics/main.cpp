@@ -79,10 +79,10 @@ int main() {
 
 	std::vector<SphereGeometry> spheres;
 	spheres.push_back(SphereGeometry(vec3(-2.5, 0, -8), 1));
-	spheres.back().emission = vec3(01.5, 0.125, 0.25) * 12.5f;
+	spheres.back().emission = vec3(01.5, 0.125, 0.25) * 15.5f;
 	spheres.push_back(SphereGeometry(vec3(0, 0, -9), 1));
 	spheres.push_back(SphereGeometry(vec3(2.5, 0, -8), 1));
-	spheres.back().emission = vec3(0.25, 0.75, 1.125) * 15.5f;
+	spheres.back().emission = vec3(0.25, 1.75, 0.125) * 15.5f;
 	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
 
 	std::vector<TriangleGeometry> triangles;

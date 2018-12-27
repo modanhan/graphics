@@ -103,12 +103,12 @@ public:
 			.build(6);
 		int iteration_count = 12;
 		do {
+			width >>= 1;
+			height >>= 1;
 			bloom->frameBuffers_horizontal.push_back(FrameBuffer::Builder()
 				.addColorAttachment(0, Texture::CreateHDR(width, height, 0))
 				.build()
 			);
-			width >>= 1;
-			height >>= 1;
 			bloom->frameBuffers_vertical.push_back(FrameBuffer::Builder()
 				.addColorAttachment(0, Texture::CreateHDR(width, height, 0))
 				.build()
@@ -126,7 +126,7 @@ public:
 			gaussianProgram->clear();
 			gaussianProgram->start();
 			glUniform2f(1, 1.0, 0.0);
-			glViewport(0, 0, width >> (i), height >> (i));
+			glViewport(0, 0, width >> (i+1), height >> (i + 1));
 			(i > 0 ? frameBuffers_vertical[i - 1] : frameBuffer)->activate(0, 0);
 			postVertexArray->render();
 			gaussianProgram->finish();
@@ -145,7 +145,7 @@ public:
 			frameBuffers_horizontal[i]->bind();
 			addProgram->clear();
 			addProgram->start();
-			glViewport(0, 0, width >> i, height >> i);
+			glViewport(0, 0, width >> (i+1), height >> (i + 1));
 			frameBuffers_vertical[i]->activate(0, 0);
 			((i == frameBuffers_horizontal.size() - 2) ? frameBuffers_vertical[i] : frameBuffers_horizontal[i + 1])->activate(0, 1);
 			postVertexArray->render();
@@ -156,7 +156,7 @@ public:
 		lerpProgram->clear();
 		lerpProgram->start();
 		glViewport(0, 0, width, height);
-		frameBuffers_horizontal.front()->activate(0, 0);
+		frameBuffers_horizontal[0]->activate(0, 0);
 		frameBuffer->activate(0, 1);
 		postVertexArray->render();
 		lerpProgram->finish();
