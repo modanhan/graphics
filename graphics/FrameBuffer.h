@@ -10,7 +10,7 @@
 class FrameBuffer
 {
 	FrameBuffer() = default;
-	GLuint fbo;
+	GLuint fbo = 0;
 	std::map<int, std::unique_ptr<Texture>> colorAttachments;
 public:
 	int bind() const;
@@ -18,7 +18,7 @@ public:
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		return 0;
 	}
-	int activate(int colorAttachment, int target) {
+	int activate(int colorAttachment, int target) const {
 		return colorAttachments.at(colorAttachment)->activate(target);
 	}
 
@@ -59,5 +59,6 @@ public:
 	operator GLuint() const {
 		return fbo;
 	}
+	static FrameBuffer null;
 };
 

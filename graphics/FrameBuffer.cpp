@@ -11,3 +11,5 @@ FrameBuffer::~FrameBuffer()
 {
 	glDeleteFramebuffers(1, &fbo);
 }
+
+FrameBuffer FrameBuffer::null = FrameBuffer();

@@ -121,13 +121,8 @@ int main() {
 		msaa_program->finish();
 	} FrameBuffer::unbind();
 
-	{
-		bloom->use(*(tonemapping->frameBuffer));
-	} FrameBuffer::unbind();
-
-	{
-		tonemapping->use();
-	}
+	bloom->use(*(tonemapping->frameBuffer));
+	tonemapping->use(FrameBuffer::null);
 
 	window->swap();
 

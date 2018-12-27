@@ -14,7 +14,7 @@ public:
 	~PostProcessing() = default;
 
 	void bind() { frameBuffer->bind(); }
-	virtual void use() { }
+	virtual void use(const FrameBuffer& externalFrameBuffer) { }
 };
 
 class DenoisePostProcessing : public PostProcessing {
@@ -47,7 +47,8 @@ public:
 		return denoise;
 	}
 
-	void use() override {
+	void use(const FrameBuffer& externalFrameBuffer) override {
+		externalFrameBuffer.bind();
 		program->clear();
 		program->start();
 		frameBuffer->activate(0, 0);
@@ -120,7 +121,7 @@ public:
 		return bloom;
 	}
 
-	void use(const FrameBuffer& externalFrameBuffer) {
+	void use(const FrameBuffer& externalFrameBuffer) override {
 		for (unsigned int i = 0; i < frameBuffers_horizontal.size(); ++i) {
 			frameBuffers_horizontal[i]->bind();
 			gaussianProgram->clear();
@@ -193,7 +194,8 @@ public:
 		return toneMapping;
 	}
 
-	void use() override {
+	void use(const FrameBuffer& externalFrameBuffer) override {
+		externalFrameBuffer.bind();
 		program->clear();
 		program->start();
 		frameBuffer->activate(0, 0);
