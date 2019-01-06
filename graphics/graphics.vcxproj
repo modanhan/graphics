@@ -151,6 +151,7 @@
     <ResourceCompile Include="graphics.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\compute.glsl" />
     <None Include="shaders\fragment-denoise.glsl" />
     <None Include="shaders\fragment-gaussian-add.glsl" />
     <None Include="shaders\fragment-gaussian.glsl" />

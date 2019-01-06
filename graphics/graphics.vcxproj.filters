@@ -93,5 +93,8 @@
     <None Include="shaders\fragment-lerp.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\compute.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

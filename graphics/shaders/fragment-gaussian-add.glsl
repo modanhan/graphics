@@ -19,7 +19,10 @@ void main(void)
 {
 	vec4 color = vec4(0.0);
 	vec4 total = SampleBox();
-	// i don't understand the linear interpolation at 0.25 below, but it seems to look better than at 0.5.
-	// likely a bug somewhere, will work on later
+	// This makes an exponential decay, altho still technically energy conserving
+	// it's hard to customize the style of the bloom and I have no idea if it's correct.
+	// The alternative would be to have a shader that has N textures where N is the number
+	// of downsamples; the shader then adds all the textures together, assigning each
+	// texture with a weight so they sum to 1.
 	FragmentColour = (total * 0.75 + texture2D(AddColourTexture, UV) * 0.25);
 }
