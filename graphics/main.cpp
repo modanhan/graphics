@@ -21,8 +21,8 @@
 using namespace RayTracing;
 using namespace glm;
 
-constexpr int WIDTH = 1280;
-constexpr int HEIGHT = 720;
+constexpr int WIDTH = 1920;
+constexpr int HEIGHT = 1080;
 
 int main() {
 	auto window = Window::Create(WIDTH, HEIGHT);
@@ -55,7 +55,6 @@ int main() {
 		.addColorAttachment(0, Texture::CreateRGBA(WIDTH, HEIGHT, 0))
 		.build();
 
-	auto denoise = DenoisePostProcessing::Create(WIDTH, HEIGHT);
 	auto bloom = BloomPostProcessing::Create(WIDTH, HEIGHT);
 	auto tonemapping = ToneMappingPostProcessing::Create(WIDTH, HEIGHT);
 
@@ -78,22 +77,33 @@ int main() {
 	auto cameraSsbo = ShaderStorageBuffer::Create(sizeof(Camera), &camera, GL_DYNAMIC_COPY, 0);
 
 	std::vector<SphereGeometry> spheres;
-	spheres.push_back(SphereGeometry(vec3(-2.5, 0, -8), 1));
-	spheres.back().emission = vec3(01.5, 0.125, 0.25) * 15.5f;
-	spheres.push_back(SphereGeometry(vec3(0, 0, -9), 1));
-	spheres.push_back(SphereGeometry(vec3(2.5, 0, -8), 1));
-	spheres.back().emission = vec3(0.25, 1.75, 0.125) * 15.5f;
+	spheres.push_back(SphereGeometry(vec3(-2, 0.5, -10), 1.5));
+	spheres.push_back(SphereGeometry(vec3(0, 0, -12), 1));
+	spheres.back().emission = vec3(0.15, 0.5, 0.925) * 19.5f;
+	spheres.push_back(SphereGeometry(vec3(3.5, 1, -8), 2));
+
+	spheres.push_back(SphereGeometry(vec3(0.25, -.75, -5), 0.25));
+	spheres.back().emission = vec3(0.75, 0.75, 0.125) * 9.5f;
+	spheres.push_back(SphereGeometry(vec3(2, -.75, -7), 0.25));
+	spheres.back().emission = vec3(0.75, 0.75, 0.125) * 9.5f;
+	spheres.push_back(SphereGeometry(vec3(-2, -.75, -6), 0.25));
+	spheres.back().emission = vec3(0.75, 0.75, 0.125) * 9.5f;
+	spheres.push_back(SphereGeometry(vec3(3, -.75, -4.5), 0.25));
+	spheres.back().emission = vec3(0.75, 0.75, 0.125) * 9.5f;
+
 	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
 
 	std::vector<TriangleGeometry> triangles;
 	triangles.push_back(TriangleGeometry(vec3(-50, -1, 5), vec3(50, -1, 5), vec3(50, -1, -200)));
 	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
-//	triangles.push_back(TriangleGeometry(vec3(-50, -50, -8), vec3(50, -50, -8), vec3(50, 50, -8)));
-//	triangles.push_back(TriangleGeometry(vec3(50, 50, -8), vec3(-50, 50, -8), vec3(-50, -50, -8)));
+	triangles.push_back(TriangleGeometry(vec3(-50, -50, -12), vec3(50, -50, -12), vec3(50, 50, -12)));
+	triangles.push_back(TriangleGeometry(vec3(50, 50, -12), vec3(-50, 50, -12), vec3(-50, -50, -12)));
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
+	auto hemisphere_vectors = hemisphere_halton(256);
+	std::cout << hemisphere_vectors.size() << std::endl;
 	auto ray_vec3sSsbo = ShaderStorageBuffer::Create(
-		sizeof(hemisphere_vector_set[0]) * hemisphere_vector_set.size(), hemisphere_vector_set.data(), GL_DYNAMIC_COPY, 3
+		sizeof(hemisphere_vectors[0]) * hemisphere_vectors.size(), hemisphere_vectors.data(), GL_DYNAMIC_COPY, 3
 	);
 
 	rt_fbo->bind(); {

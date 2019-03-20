@@ -1,6 +1,36 @@
 #include "hemisphere_vector_set.h"
 using namespace glm;
 
+std::vector<vec3> hemisphere_halton(int size) {
+	std::vector<vec3> ret(size);
+	int Base0 = 2;
+	int Base1 = 3;
+	for (int i = 0; i < size; ++i) {
+		float f0 = 1;
+		float r0 = 0;
+		float f1 = 1;
+		float r1 = 0;
+		int i0 = i;
+		int i1 = i;
+		while (i0 > 0) {
+			f0 = f0 / Base0;
+			r0 = r0 + f0 * (i0 % Base0);
+			if (i0 == i0 / Base0) break;
+			i0 = i0 / Base0;
+		}
+		while (i1 > 0) {
+			f1 = f1 / Base1;
+			r1 = r1 + f1 * (i1 % Base1);
+			if (i1 == i1 / Base1) break;
+			i1 = i1 / Base1;
+		}
+		float u = 2 * 3.14159265 * r0;
+		float v = sqrt(1 - r1 * r1);
+		ret[i] = vec3(v * cos(u), v * sin(u), -r1);
+	}
+	return ret;
+}
+
 std::vector<vec3> hemisphere_vector_set = {
 vec3(-0.7642502, 0.07722455, 0.6402797),
 vec3(-0.7023612, 0.03645026, 0.710887),
