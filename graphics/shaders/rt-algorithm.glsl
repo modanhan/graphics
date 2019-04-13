@@ -38,7 +38,7 @@ hit triangle_hit(triangle_data tri, vec3 origin, vec3 direction) {
 		return createHit(vec3(0), 1e+38);
 	float t = f * dot(edge2, q);
 	if (t > 0) {
-		return createHit(normalize(cross(edge1, edge2)), t);
+		return createHit(normalize(cross(edge1, edge2)), t, tri.emission);
 	}
 	return createHit(vec3(0), 1e+38);
 }
@@ -71,28 +71,36 @@ vec3 ray_trace(vec3 direction) {
 
 	vec3 hit_position = camera_position + direction * d;
 	vec3 intensity = vec3(0);
-	mat3 fragmentRandomRotate = mat3(rotationMatrix(_random(direction), 2.0));
+	float intensity_max = 0;
 
-	float fv = _random(gl_FragCoord.xyz).z;
-	mat3 fragment_random_ray = mat3(1);
+	mat3 normal_rotate = mat3(1);
+	normal_rotate = rotationMatrixFromTo(vec3(0, 1, 0), normal);
+	vec3 _rrv = _random(direction);
+	mat3 random_rotate = mat3(rotationMatrix(normal, _rrv.x + _rrv.y + _rrv.z));
+
 	for (int i = 0; i < ray_vec3s.length(); ++i) {
 		vec3 r_emission = vec3(0);
 		bool s_hit = false;
 
-		vec3 n_d = fragment_random_ray * ray_vec3s[i];
-		n_d = fragmentRandomRotate * n_d;
-		if (dot(n_d, normal) < 0) n_d = -n_d;
-		
+		vec3 n_d = vec3(ray_vec3s[i]);
+
+		// importance sampling
+		float is_angle = (acos(n_d.y));
+		mat3 is_rotate = mat3(rotationMatrix(cross(n_d, vec3(0, 1, 0)), -asin(is_angle / 3.1415926 * 0.5) ));
+		n_d = is_rotate * n_d;
+		n_d = normal_rotate * n_d;
+		n_d = random_rotate * n_d;
+
 		float r_d = 1e+38;
 		for (int i = 0; i < spheres.length(); ++i) {
-			hit h = sphere_hit(spheres[i], hit_position + n_d * EPSILON, n_d);
+			hit h = sphere_hit(spheres[i], hit_position + normal * EPSILON, n_d);
 			if (h.d < r_d) {
 				r_d = h.d;
 				r_emission = h.emission;
 			}
 		}
 		for (int i = 0; i < triangles.length(); ++i) {
-			hit h = triangle_hit(triangles[i], hit_position + n_d * EPSILON, n_d);
+			hit h = triangle_hit(triangles[i], hit_position + normal * EPSILON, n_d);
 			if (h.d < r_d) {
 				r_d = h.d;
 				r_emission = h.emission;
@@ -101,7 +109,9 @@ vec3 ray_trace(vec3 direction) {
 		if (r_d >= 1e+38) {
 			r_emission = vec3(0);
 		}
-		intensity += r_emission;
+		float pdf = dot(n_d, normal);
+		intensity += r_emission * dot(n_d, normal) / pdf; // <- this is super redudant, it's Lambertian and importance
+		intensity_max += 1;
 	}
-	return d_emission + (intensity / ray_vec3s.length());
+	return d_emission + (intensity / intensity_max);
 }

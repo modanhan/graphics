@@ -38,3 +38,9 @@ mat4 rotationMatrix(vec3 axis, float angle)
                 oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
                 0.0,                                0.0,                                0.0,                                1.0);
 }
+
+mat3 rotationMatrixFromTo(vec3 from, vec3 to) {
+	if (from == to) return mat3(1);
+	if (from == -to) return mat3(-1);
+	return mat3(rotationMatrix(cross(to, from), acos(dot(from, to))));
+}

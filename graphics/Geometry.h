@@ -41,6 +41,8 @@ namespace RayTracing {
 		float p1;
 		glm::vec3 v2;
 		float p2;
+		glm::vec3 emission;
+		float p3;
 
 		TriangleGeometry(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2)
 			: v0(v0)

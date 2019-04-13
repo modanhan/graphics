@@ -17,12 +17,13 @@ struct triangle_data {
 	vec3 v0;
 	vec3 v1;
 	vec3 v2;
+	vec3 emission;
 };
 
 layout(std430, binding = 0) buffer camera_buffer { camera_data camera; };
 layout(std430, binding = 1) buffer sphere_buffer { sphere_data[] spheres; };
 layout(std430, binding = 2) buffer triangle_buffer { triangle_data[] triangles; };
-layout(std430, binding = 3) buffer ray_vec3_buffer { vec3[] ray_vec3s; };
+layout(std430, binding = 3) buffer ray_vec3_buffer { vec4[] ray_vec3s; };
 
 struct hit {
 	vec3 normal;
