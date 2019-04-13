@@ -66,7 +66,7 @@ vec3 ray_trace(vec3 direction) {
 	}
 
 	if (d == 1e+38) {
-		return d_emission;
+		return texture(ibl, SampleSphericalMap(direction)).xyz;
 	}
 
 	vec3 hit_position = camera_position + direction * d;
@@ -107,10 +107,10 @@ vec3 ray_trace(vec3 direction) {
 			}
 		}
 		if (r_d >= 1e+38) {
-			r_emission = vec3(0);
+			r_emission = texture(ibl, SampleSphericalMap(n_d)).xyz;
 		}
 		float pdf = cos(-asin(is_angle / 3.1415926 * 0.5));
-		intensity += r_emission * dot(n_d, normal) / pdf; // <- this is super redudant, it's Lambertian and importance
+		intensity += r_emission * dot(n_d, normal) / pdf;
 		intensity_max += 1;
 	}
 	return d_emission + (intensity / intensity_max);

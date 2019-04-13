@@ -38,6 +38,7 @@
       <Filter>ray-tracing</Filter>
     </ClInclude>
     <ClInclude Include="PostProcessing.h" />
+    <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ray-tracing">

@@ -25,6 +25,8 @@ layout(std430, binding = 1) buffer sphere_buffer { sphere_data[] spheres; };
 layout(std430, binding = 2) buffer triangle_buffer { triangle_data[] triangles; };
 layout(std430, binding = 3) buffer ray_vec3_buffer { vec4[] ray_vec3s; };
 
+layout(binding = 4) uniform sampler2D ibl;
+
 struct hit {
 	vec3 normal;
 	float d;

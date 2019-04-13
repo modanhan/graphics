@@ -143,6 +143,7 @@
     <ClInclude Include="PostProcessing.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ShaderStorageBuffer.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="VertexArray.h" />
     <ClInclude Include="ShaderTools.h" />

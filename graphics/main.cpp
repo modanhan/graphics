@@ -79,48 +79,39 @@ int main() {
 	std::vector<SphereGeometry> spheres;
 	spheres.push_back(SphereGeometry(vec3(-2, 0.5, -10), 1.5));
 	spheres.push_back(SphereGeometry(vec3(0, 0, -12), 1));
-	spheres.back().emission = vec3(0.15, 0.5, 0.925) * 48.5f;
+	spheres.back().emission = vec3(0.15, 0.5, 0.925) * 24.5f;
 	spheres.push_back(SphereGeometry(vec3(3.5, 1, -8), 2));
-
-//	spheres.push_back(SphereGeometry(vec3(0.25, 0.0, -5), 0.25));
-//	spheres.back().emission = vec3(0.75, 0.75, 0.125) * 9.5f;
 	spheres.push_back(SphereGeometry(vec3(2, -.75, -7), 0.25));
-	spheres.back().emission = vec3(0.75, 0.75, 0.125) * 12.5f;
-//	spheres.push_back(SphereGeometry(vec3(-2, -.75, -6), 0.25));
-//	spheres.back().emission = vec3(0.75, 0.75, 0.125) * 9.5f;
-//	spheres.push_back(SphereGeometry(vec3(3, -.75, -4.5), 0.25));
-//	spheres.back().emission = vec3(0.75, 0.75, 0.125) * 9.5f;
+//	spheres.back().emission = vec3(0.75, 0.75, 0.125) * 12.5f;
 
 	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
 
 	std::vector<TriangleGeometry> triangles;
 	triangles.push_back(TriangleGeometry(vec3(-50, -1, 5), vec3(50, -1, 5), vec3(50, -1, -200)));
 	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
-//	triangles.push_back(TriangleGeometry(vec3(-50, 1, 5),  vec3(50, 1, -200), vec3(50, 1, 5)));
-//	triangles.push_back(TriangleGeometry(vec3(50, 1, -200),  vec3(-50, 1, 5),vec3(-50, 1, -200)));
-	triangles.push_back(TriangleGeometry(vec3(-64, -64, -22), vec3(64, -64, -22), vec3(64, 64, -22)));
-	triangles.push_back(TriangleGeometry(vec3(64, 64, -22), vec3(-64, 64, -22), vec3(-64, -64, -22)));
-//	triangles.push_back(TriangleGeometry(vec3(1, 1, -9), vec3(-2.5, 1, -8), vec3(-1, 3, -6.25)));
-//	triangles.back().emission = vec3(0.15, 0.5, 0.925) * 19.5f;
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
-	auto hemisphere_vectors = hemisphere_halton(1024);
+	auto hemisphere_vectors = hemisphere_halton(512);
 	auto ray_vec3sSsbo = ShaderStorageBuffer::Create(
 		sizeof(hemisphere_vectors[0]) * hemisphere_vectors.size(), hemisphere_vectors.data(), GL_DYNAMIC_COPY, 3
 	);
 
-	tonemapping->bind(); {
+	auto ibl = Texture::SBTCreateHDR("Resources/MIT-01_Ref.hdr");
+	if (!ibl) return -1;
+
+	bloom->bind(); {
 		rt_program->clear();
 		rt_program->start();
 
 		spheresSsbo->bind();
 		trianglessSsbo->bind();
+		ibl->activate(4);
 		rt_vertexArray->render();
 
 		rt_program->finish();
 	} FrameBuffer::unbind();
 
-	//bloom->use(*(tonemapping->frameBuffer));
+	bloom->use(*(tonemapping->frameBuffer));
 	tonemapping->use(FrameBuffer::null);
 
 	window->swap();

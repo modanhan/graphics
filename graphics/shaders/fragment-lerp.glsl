@@ -9,5 +9,5 @@ layout(binding = 1) uniform sampler2D ColourTexture1;
 
 void main(void)
 {
-	FragmentColour = mix(texture2D(ColourTexture0, UV), texture2D(ColourTexture1, UV), 0.5);
+	FragmentColour = mix(texture2D(ColourTexture0, UV), texture2D(ColourTexture1, UV), 0.75);
 }
