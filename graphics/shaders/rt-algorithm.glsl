@@ -109,7 +109,7 @@ vec3 ray_trace(vec3 direction) {
 		if (r_d >= 1e+38) {
 			r_emission = vec3(0);
 		}
-		float pdf = dot(n_d, normal);
+		float pdf = cos(-asin(is_angle / 3.1415926 * 0.5));
 		intensity += r_emission * dot(n_d, normal) / pdf; // <- this is super redudant, it's Lambertian and importance
 		intensity_max += 1;
 	}

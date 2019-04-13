@@ -98,8 +98,8 @@ int main() {
 	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
 //	triangles.push_back(TriangleGeometry(vec3(-50, 1, 5),  vec3(50, 1, -200), vec3(50, 1, 5)));
 //	triangles.push_back(TriangleGeometry(vec3(50, 1, -200),  vec3(-50, 1, 5),vec3(-50, 1, -200)));
-	triangles.push_back(TriangleGeometry(vec3(-64, -64, -16), vec3(64, -64, -16), vec3(64, 64, -16)));
-	triangles.push_back(TriangleGeometry(vec3(64, 64, -16), vec3(-64, 64, -16), vec3(-64, -64, -16)));
+	triangles.push_back(TriangleGeometry(vec3(-64, -64, -22), vec3(64, -64, -22), vec3(64, 64, -22)));
+	triangles.push_back(TriangleGeometry(vec3(64, 64, -22), vec3(-64, 64, -22), vec3(-64, -64, -22)));
 //	triangles.push_back(TriangleGeometry(vec3(1, 1, -9), vec3(-2.5, 1, -8), vec3(-1, 3, -6.25)));
 //	triangles.back().emission = vec3(0.15, 0.5, 0.925) * 19.5f;
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);

@@ -12,7 +12,7 @@ vec3 proj(vec3 u, vec3 v) {
 }
 
 vec3 _random(vec3 v) {
-	return fract(cross(cos(v * 273.1523) * 12.23, vec3(3.45, -12.67, 9.45))) * 2.0 - 1.0;
+	return fract(cross(cos(v * 2793.1523) * 12.23, vec3(243.45, -172.67, 91776.45))) * 2.0 - 1.0;
 }
 
 vec2 quadratic(float a, float b, float c) {
