@@ -91,7 +91,7 @@ int main() {
 	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
-	auto hemisphere_vectors = hemisphere_halton(512);
+	auto hemisphere_vectors = hemisphere_halton(1 << 12);
 	auto ray_vec3sSsbo = ShaderStorageBuffer::Create(
 		sizeof(hemisphere_vectors[0]) * hemisphere_vectors.size(), hemisphere_vectors.data(), GL_DYNAMIC_COPY, 3
 	);
@@ -99,7 +99,7 @@ int main() {
 	auto ibl = Texture::SBTCreateHDR("Resources/MIT-01_Ref.hdr");
 	if (!ibl) return -1;
 
-	bloom->bind(); {
+	tonemapping->bind(); {
 		rt_program->clear();
 		rt_program->start();
 
@@ -111,7 +111,7 @@ int main() {
 		rt_program->finish();
 	} FrameBuffer::unbind();
 
-	bloom->use(*(tonemapping->frameBuffer));
+	//bloom->use(*(tonemapping->frameBuffer));
 	tonemapping->use(FrameBuffer::null);
 
 	window->swap();

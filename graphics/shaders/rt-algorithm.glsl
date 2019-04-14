@@ -43,6 +43,37 @@ hit triangle_hit(triangle_data tri, vec3 origin, vec3 direction) {
 	return createHit(vec3(0), 1e+38);
 }
 
+float d_ggx(vec3 m, vec3 n) {
+	float alpha = 0.041;
+	float x = dot(n, m) * dot(n, m) * (alpha * alpha - 1) + 1;
+	return alpha * alpha / (PI * x * x);
+}
+
+float g_implicit(vec3 l, vec3 v, vec3 n) {
+	return dot(n, l) * dot(n, v) / max( dot(n, l), dot(n, v));
+}
+
+float g_ggx(vec3 v, vec3 n) {
+	float alpha = 0.041;
+	float alpha2 = alpha * alpha;
+	float nv = dot(n, v);
+	return 2 * nv / (nv + sqrt(alpha2 + (1 - alpha2) * nv * nv ));
+}
+
+float f_none() {
+	return 1;
+}
+
+float f_schlick(float cos_theta) {
+	float r0 = 0.05;
+	return r0 + (1 - r0) * pow(1 - cos_theta, 5);
+}
+
+float cook_torrance(vec3 v, vec3 n, vec3 l) {
+	if (dot(n, l) == 0 || dot(n, v) == 0) return 0;
+	return d_ggx(l, reflect(v, n)) * f_schlick(dot(n, v)) * g_ggx(l, n) / (4 * dot(n, l) * dot(n, v));
+}
+
 vec3 ray_trace(vec3 direction) {
 	float d = 1e+38;
 	vec3 normal;
@@ -87,7 +118,7 @@ vec3 ray_trace(vec3 direction) {
 		// importance sampling
 		float is_angle = (acos(n_d.y));
 		mat3 is_rotate = mat3(rotationMatrix(cross(n_d, vec3(0, 1, 0)), -asin(is_angle / 3.1415926 * 0.5) ));
-		n_d = is_rotate * n_d;
+	//	n_d = is_rotate * n_d;
 		n_d = normal_rotate * n_d;
 		n_d = random_rotate * n_d;
 
@@ -110,7 +141,9 @@ vec3 ray_trace(vec3 direction) {
 			r_emission = texture(ibl, SampleSphericalMap(n_d)).xyz;
 		}
 		float pdf = cos(-asin(is_angle / 3.1415926 * 0.5));
-		intensity += r_emission * dot(n_d, normal) / pdf;
+		pdf = 1;
+		intensity += r_emission * dot(n_d, normal)							* 0.72 / pdf; // diffuse
+		intensity += r_emission * cook_torrance(-direction, normal, n_d)	* 0.28 / pdf; // specular
 		intensity_max += 1;
 	}
 	return d_emission + (intensity / intensity_max);

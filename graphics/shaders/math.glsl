@@ -2,6 +2,7 @@
 #extension GL_ARB_shading_language_include : require
 
 const float EPSILON = 0.0001;
+const float PI = 3.141592653;
 
 float length2(vec3 v) {
 	return dot(v, v);
