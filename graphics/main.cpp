@@ -87,19 +87,19 @@ int main() {
 	auto spheresSsbo = ShaderStorageBuffer::Create(sizeof(spheres[0]) * spheres.size(), spheres.data(), GL_DYNAMIC_COPY, 1);
 
 	std::vector<TriangleGeometry> triangles;
-	triangles.push_back(TriangleGeometry(vec3(-50, -1, 5), vec3(50, -1, 5), vec3(50, -1, -200)));
-	triangles.push_back(TriangleGeometry(vec3(50, -1, -200), vec3(-50, -1, -200), vec3(-50, -1, 5)));
+	triangles.push_back(TriangleGeometry(vec3(-15, -1, -0), vec3(15, -1, -0), vec3(15, -1, -15)));
+	triangles.push_back(TriangleGeometry(vec3(15, -1, -15), vec3(-15, -1, -15), vec3(-15, -1, -0)));
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
-	auto hemisphere_vectors = hemisphere_halton(1 << 12);
+	auto hemisphere_vectors = hemisphere_halton(1 << 13);
 	auto ray_vec3sSsbo = ShaderStorageBuffer::Create(
 		sizeof(hemisphere_vectors[0]) * hemisphere_vectors.size(), hemisphere_vectors.data(), GL_DYNAMIC_COPY, 3
 	);
 
-	auto ibl = Texture::SBTCreateHDR("Resources/MIT-01_Ref.hdr");
+	auto ibl = Texture::SBTCreateHDR("Resources/Newport_Loft_Ref.hdr");
 	if (!ibl) return -1;
 
-	tonemapping->bind(); {
+	bloom->bind(); {
 		rt_program->clear();
 		rt_program->start();
 
@@ -111,7 +111,7 @@ int main() {
 		rt_program->finish();
 	} FrameBuffer::unbind();
 
-	//bloom->use(*(tonemapping->frameBuffer));
+	bloom->use(*(tonemapping->frameBuffer));
 	tonemapping->use(FrameBuffer::null);
 
 	window->swap();

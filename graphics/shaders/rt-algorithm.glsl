@@ -44,7 +44,7 @@ hit triangle_hit(triangle_data tri, vec3 origin, vec3 direction) {
 }
 
 float d_ggx(vec3 m, vec3 n) {
-	float alpha = 0.041;
+	float alpha = 0.02;
 	float x = dot(n, m) * dot(n, m) * (alpha * alpha - 1) + 1;
 	return alpha * alpha / (PI * x * x);
 }
@@ -54,7 +54,7 @@ float g_implicit(vec3 l, vec3 v, vec3 n) {
 }
 
 float g_ggx(vec3 v, vec3 n) {
-	float alpha = 0.041;
+	float alpha = 0.06;
 	float alpha2 = alpha * alpha;
 	float nv = dot(n, v);
 	return 2 * nv / (nv + sqrt(alpha2 + (1 - alpha2) * nv * nv ));
@@ -64,14 +64,48 @@ float f_none() {
 	return 1;
 }
 
-float f_schlick(float cos_theta) {
-	float r0 = 0.05;
+float f_schlick(float cos_theta, float r0) {
 	return r0 + (1 - r0) * pow(1 - cos_theta, 5);
 }
 
-float cook_torrance(vec3 v, vec3 n, vec3 l) {
-	if (dot(n, l) == 0 || dot(n, v) == 0) return 0;
-	return d_ggx(l, reflect(v, n)) * f_schlick(dot(n, v)) * g_ggx(l, n) / (4 * dot(n, l) * dot(n, v));
+float chiGGX(float v)
+{
+    return v > 0 ? 1 : 0;
+}
+
+float GGX_Distribution(vec3 m, vec3 n, float alpha)
+{
+    float NoH = dot(m, n);
+    float alpha2 = alpha * alpha;
+    float NoH2 = NoH * NoH;
+    float den = NoH2 * alpha2 + (1 - NoH2);
+    return (chiGGX(NoH) * alpha2) / (PI * den * den);
+}
+
+float GGX_PartialGeometryTerm(vec3 v, vec3 n, vec3 h, float alpha)
+{
+    float VoH2 = (sdot(v, h) + 0.00001);
+    float chi = chiGGX(VoH2 / (sdot(v, n) + 0.00001));
+    VoH2 = VoH2 * VoH2;
+    float tan2 = (1 - VoH2) / VoH2;
+    return (chi * 2) / (1 + sqrt(1 + alpha * alpha * tan2));
+}
+
+float cook_torrance(vec3 v, vec3 n, vec3 l)
+{
+	float roughness = 0.05;
+    float NoV = saturate(dot(n, v));
+    vec3 r = reflect(v, n);
+    vec3 h = normalize(l - v);
+    float cosT = saturate(dot(l, n));
+    float sinT = sqrt(1 - cosT * cosT);
+    float geometry = GGX_PartialGeometryTerm(v, n, h, roughness) * GGX_PartialGeometryTerm(r, n, h, roughness);
+    float denominator = 4 * sdot(v, n) * sdot(n, l) + 0.0001;
+    return
+        GGX_Distribution(l, r, roughness)
+		* geometry
+        / denominator
+        ;
 }
 
 vec3 ray_trace(vec3 direction) {
@@ -116,8 +150,8 @@ vec3 ray_trace(vec3 direction) {
 		vec3 n_d = vec3(ray_vec3s[i]);
 
 		// importance sampling
-		float is_angle = (acos(n_d.y));
-		mat3 is_rotate = mat3(rotationMatrix(cross(n_d, vec3(0, 1, 0)), -asin(is_angle / 3.1415926 * 0.5) ));
+		float is_angle = acos(n_d.y) / 3.1415926 * 0.5;
+		mat3 is_rotate = mat3(rotationMatrix(cross(n_d, vec3(0, 1, 0)), -asin(is_angle) ));
 	//	n_d = is_rotate * n_d;
 		n_d = normal_rotate * n_d;
 		n_d = random_rotate * n_d;
@@ -140,10 +174,10 @@ vec3 ray_trace(vec3 direction) {
 		if (r_d >= 1e+38) {
 			r_emission = texture(ibl, SampleSphericalMap(n_d)).xyz;
 		}
-		float pdf = cos(-asin(is_angle / 3.1415926 * 0.5));
+		float pdf = cos(-asin(is_angle));
 		pdf = 1;
-		intensity += r_emission * dot(n_d, normal)							* 0.72 / pdf; // diffuse
-		intensity += r_emission * cook_torrance(-direction, normal, n_d)	* 0.28 / pdf; // specular
+		intensity += r_emission * dot(n_d, normal)						* 0.82 / pdf; // diffuse
+		intensity += r_emission * cook_torrance(direction, normal, n_d)	* 0.18 / pdf; // specular
 		intensity_max += 1;
 	}
 	return d_emission + (intensity / intensity_max);
