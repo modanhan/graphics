@@ -50,7 +50,7 @@ mat3 rotationMatrixFromTo(vec3 from, vec3 to) {
 vec2 SampleSphericalMap(vec3 v)
 {
 	// todo some cheeky stuff
-	v = mat3(rotationMatrix(vec3(0, 1, 0), 1)) * v;
+	v = mat3(rotationMatrix(vec3(0, 1, 0), 1.1)) * v;
     vec2 uv = vec2(atan(v.z, v.x), asin(v.y));
     uv *= vec2(0.1591, 0.3183);
     uv += 0.5;

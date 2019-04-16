@@ -75,10 +75,10 @@ float chiGGX(float v)
 
 float GGX_Distribution(vec3 m, vec3 n, float alpha)
 {
-    float NoH = dot(m, n);
+    float NoH = sdot(m, n) + 0.00001;
     float alpha2 = alpha * alpha;
-    float NoH2 = NoH * NoH;
-    float den = NoH2 * alpha2 + (1 - NoH2);
+    float NoH2 = saturate(NoH * NoH);
+    float den = NoH2 * alpha2 + (1.00001 - NoH2);
     return (chiGGX(NoH) * alpha2) / (PI * den * den);
 }
 
@@ -91,19 +91,30 @@ float GGX_PartialGeometryTerm(vec3 v, vec3 n, vec3 h, float alpha)
     return (chi * 2) / (1 + sqrt(1 + alpha * alpha * tan2));
 }
 
-float cook_torrance(vec3 v, vec3 n, vec3 l)
+vec3 Fresnel_Schlick(float cosT, vec3 F0)
 {
-	float roughness = 0.05;
-    float NoV = saturate(dot(n, v));
-    vec3 r = reflect(v, n);
-    vec3 h = normalize(l - v);
+	return F0 + (1-F0) * pow( 1 - cosT, 5);
+}
+
+vec3 cook_torrance(vec3 v, vec3 n, vec3 l)
+{
+	float roughness = 0.03;
+    vec3 r = reflect(-v, n);
+    vec3 h = normalize(l + v);
     float cosT = saturate(dot(l, n));
     float sinT = sqrt(1 - cosT * cosT);
-    float geometry = GGX_PartialGeometryTerm(v, n, h, roughness) * GGX_PartialGeometryTerm(r, n, h, roughness);
-    float denominator = 4 * sdot(v, n) * sdot(n, l) + 0.0001;
+    float geometry = GGX_PartialGeometryTerm(-v, n, h, roughness) * GGX_PartialGeometryTerm(r, n, h, roughness);
+    float denominator = saturate(4 * sdot(-v, n) * sdot(n, h)) + 0.0001;
+	// Calculate colour at normal incidence
+	vec3 ior = vec3(0.93, 0.73, 0.33);
+	vec3 F0 = abs((1.0 - ior) / (1.0 + ior));
+	F0 = F0 * F0;
+	F0 = mix(F0, vec3(1, 1, 1), 0.9);
     return
-        GGX_Distribution(l, r, roughness)
+		vec3(1, 1, 1)
+        * GGX_Distribution(l, r, roughness)
 		* geometry
+		* Fresnel_Schlick(dot(-v, h), F0)
         / denominator
         ;
 }
@@ -176,8 +187,8 @@ vec3 ray_trace(vec3 direction) {
 		}
 		float pdf = cos(-asin(is_angle));
 		pdf = 1;
-		intensity += r_emission * dot(n_d, normal)						* 0.82 / pdf; // diffuse
-		intensity += r_emission * cook_torrance(direction, normal, n_d)	* 0.18 / pdf; // specular
+		intensity += r_emission * dot(n_d, normal)							* 0.10 / pdf; // diffuse
+		intensity += r_emission * cook_torrance(-direction, normal, n_d)	* 0.90 / pdf; // specular
 		intensity_max += 1;
 	}
 	return d_emission + (intensity / intensity_max);
