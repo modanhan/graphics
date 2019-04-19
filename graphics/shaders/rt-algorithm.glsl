@@ -96,25 +96,23 @@ vec3 Fresnel_Schlick(float cosT, vec3 F0)
 	return F0 + (1-F0) * pow( 1 - cosT, 5);
 }
 
+float roughness = 0.03;
+float metallic = 0.99;
+vec3 F0 = vec3(0.7);
+
 vec3 cook_torrance(vec3 v, vec3 n, vec3 l)
 {
-	float roughness = 0.03;
     vec3 r = reflect(-v, n);
     vec3 h = normalize(l + v);
-    float cosT = saturate(dot(l, n));
-    float sinT = sqrt(1 - cosT * cosT);
+	
+	vec3 fresnel = Fresnel_Schlick(sdot(v, h), F0);
+	float distribution = GGX_Distribution(l, r, roughness);
     float geometry = GGX_PartialGeometryTerm(-v, n, h, roughness) * GGX_PartialGeometryTerm(r, n, h, roughness);
-    float denominator = saturate(4 * sdot(-v, n) * sdot(n, h)) + 0.0001;
-	// Calculate colour at normal incidence
-	vec3 ior = vec3(0.93, 0.73, 0.33);
-	vec3 F0 = abs((1.0 - ior) / (1.0 + ior));
-	F0 = F0 * F0;
-	F0 = mix(F0, vec3(1, 1, 1), 0.9);
-    return
-		vec3(1, 1, 1)
-        * GGX_Distribution(l, r, roughness)
+    float denominator = saturate(4 * dot(-v, n) * dot(n, h)) + 0.0001;
+    return vec3(1)
+		* fresnel
+        * distribution
 		* geometry
-		* Fresnel_Schlick(dot(-v, h), F0)
         / denominator
         ;
 }
@@ -187,8 +185,8 @@ vec3 ray_trace(vec3 direction) {
 		}
 		float pdf = cos(-asin(is_angle));
 		pdf = 1;
-		intensity += r_emission * dot(n_d, normal)							* 0.10 / pdf; // diffuse
-		intensity += r_emission * cook_torrance(-direction, normal, n_d)	* 0.90 / pdf; // specular
+		intensity += r_emission * dot(n_d, normal)							* (1-metallic) / pdf; // diffuse
+		intensity += r_emission * cook_torrance(-direction, normal, n_d)	* (metallic) / pdf; // specular
 		intensity_max += 1;
 	}
 	return d_emission + (intensity / intensity_max);
