@@ -91,7 +91,7 @@ int main() {
 	triangles.push_back(TriangleGeometry(vec3(15, -1, -15), vec3(-15, -1, -15), vec3(-15, -1, -0)));
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
-	auto hemisphere_vectors = hemisphere_halton(1 << 13);
+	auto hemisphere_vectors = hemisphere_halton(1 << 14);
 	auto ray_vec3sSsbo = ShaderStorageBuffer::Create(
 		sizeof(hemisphere_vectors[0]) * hemisphere_vectors.size(), hemisphere_vectors.data(), GL_DYNAMIC_COPY, 3
 	);

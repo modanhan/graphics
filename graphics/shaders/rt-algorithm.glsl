@@ -43,78 +43,43 @@ hit triangle_hit(triangle_data tri, vec3 origin, vec3 direction) {
 	return createHit(vec3(0), 1e+38);
 }
 
-float d_ggx(vec3 m, vec3 n) {
-	float alpha = 0.02;
-	float x = dot(n, m) * dot(n, m) * (alpha * alpha - 1) + 1;
-	return alpha * alpha / (PI * x * x);
-}
-
-float g_implicit(vec3 l, vec3 v, vec3 n) {
-	return dot(n, l) * dot(n, v) / max( dot(n, l), dot(n, v));
-}
-
-float g_ggx(vec3 v, vec3 n) {
-	float alpha = 0.06;
-	float alpha2 = alpha * alpha;
-	float nv = dot(n, v);
-	return 2 * nv / (nv + sqrt(alpha2 + (1 - alpha2) * nv * nv ));
-}
-
-float f_none() {
-	return 1;
-}
-
-float f_schlick(float cos_theta, float r0) {
-	return r0 + (1 - r0) * pow(1 - cos_theta, 5);
-}
-
-float chiGGX(float v)
-{
-    return v > 0 ? 1 : 0;
-}
-
-float GGX_Distribution(vec3 m, vec3 n, float alpha)
-{
-    float NoH = sdot(m, n) + 0.00001;
-    float alpha2 = alpha * alpha;
-    float NoH2 = saturate(NoH * NoH);
-    float den = NoH2 * alpha2 + (1.00001 - NoH2);
-    return (chiGGX(NoH) * alpha2) / (PI * den * den);
-}
-
-float GGX_PartialGeometryTerm(vec3 v, vec3 n, vec3 h, float alpha)
-{
-    float VoH2 = (sdot(v, h) + 0.00001);
-    float chi = chiGGX(VoH2 / (sdot(v, n) + 0.00001));
-    VoH2 = VoH2 * VoH2;
-    float tan2 = (1 - VoH2) / VoH2;
-    return (chi * 2) / (1 + sqrt(1 + alpha * alpha * tan2));
-}
-
-vec3 Fresnel_Schlick(float cosT, vec3 F0)
-{
-	return F0 + (1-F0) * pow( 1 - cosT, 5);
-}
-
-float roughness = 0.03;
+float roughness = 0.15;
 float metallic = 0.99;
-vec3 F0 = vec3(0.7);
+vec3 F0 = vec3(0.98,  0.98, 0.98);
 
-vec3 cook_torrance(vec3 v, vec3 n, vec3 l)
+float d_ggx(vec3 v, vec3 n)
 {
-    vec3 r = reflect(-v, n);
-    vec3 h = normalize(l + v);
-	
-	vec3 fresnel = Fresnel_Schlick(sdot(v, h), F0);
-	float distribution = GGX_Distribution(l, r, roughness);
-    float geometry = GGX_PartialGeometryTerm(-v, n, h, roughness) * GGX_PartialGeometryTerm(r, n, h, roughness);
-    float denominator = saturate(4 * dot(-v, n) * dot(n, h)) + 0.0001;
+	float alpha = roughness * roughness;
+	float alpha2 = alpha * alpha;
+    float nm = dot(n, v);
+    float denominator = (nm * nm * (alpha2 - 1) + 1);
+    return alpha2 / (PI * denominator * denominator);
+}
+
+vec3 f_schlick(float cosT, vec3 F0)
+{
+	return F0 + (1 - F0) * pow(1 - cosT, 5);
+}
+
+float g_ggx(vec3 v, vec3 h) {
+	float alpha = roughness * roughness;
+	float alpha2 = alpha * alpha / 1;
+	float hv = sdot(h, v);
+	return 1 / (hv * (1 - alpha2) + alpha2);
+}
+
+float g_smith(vec3 i, vec3 o, vec3 h) {
+	return g_ggx(i, h) * g_ggx(o, h);
+}
+
+vec3 cook_torrance(vec3 i, vec3 n, vec3 o) {
+    vec3 h = normalize(o + i);
     return vec3(1)
-		* fresnel
-        * distribution
-		* geometry
-        / denominator
-        ;
+		* d_ggx(n, h)
+		* f_schlick(sdot(i, h), F0)
+		* g_smith(i, o, n)
+		* dot(n, o)
+		;
 }
 
 vec3 ray_trace(vec3 direction) {
@@ -165,6 +130,9 @@ vec3 ray_trace(vec3 direction) {
 		n_d = normal_rotate * n_d;
 		n_d = random_rotate * n_d;
 
+	//	vec3 ref = reflect(direction, normal);
+	//	n_d = normalize(mix(n_d, ref, 1 - roughness));
+
 		float r_d = 1e+38;
 		for (int i = 0; i < spheres.length(); ++i) {
 			hit h = sphere_hit(spheres[i], hit_position + normal * EPSILON, n_d);
@@ -185,7 +153,8 @@ vec3 ray_trace(vec3 direction) {
 		}
 		float pdf = cos(-asin(is_angle));
 		pdf = 1;
-		intensity += r_emission * dot(n_d, normal)							* (1-metallic) / pdf; // diffuse
+	//	pdf = 1 / roughness / roughness;
+		intensity += r_emission * dot(n_d, normal)							* (1 - metallic) / pdf; // diffuse
 		intensity += r_emission * cook_torrance(-direction, normal, n_d)	* (metallic) / pdf; // specular
 		intensity_max += 1;
 	}
