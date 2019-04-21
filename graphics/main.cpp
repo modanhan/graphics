@@ -39,18 +39,6 @@ int main() {
 		.addColorAttachment(0, Texture::CreateHDR(WIDTH, HEIGHT, 0))
 		.build();
 
-	auto msaa_vertexShader = Shader::Create(GL_VERTEX_SHADER, "shaders/vertex-uv.glsl");
-	auto msaa_fragmentShader = Shader::Create(GL_FRAGMENT_SHADER, std::vector<std::string>{
-		"shaders/fragment-rt-adaptive-msaa.glsl",
-		"shaders/math.glsl",
-		"shaders/rt-data.glsl",
-		"shaders/rt-algorithm.glsl"
-	});
-	auto msaa_program = Program::CreateGraphic(*msaa_vertexShader, *msaa_fragmentShader);
-
-	auto msaa_fbo = FrameBuffer::Builder()
-		.addColorAttachment(0, Texture::CreateHDR(WIDTH, HEIGHT, 0))
-		.build();
 	auto tonemap_fbo = FrameBuffer::Builder()
 		.addColorAttachment(0, Texture::CreateRGBA(WIDTH, HEIGHT, 0))
 		.build();
@@ -91,7 +79,7 @@ int main() {
 	triangles.push_back(TriangleGeometry(vec3(15, -1, -15), vec3(-15, -1, -15), vec3(-15, -1, -0)));
 	auto trianglessSsbo = ShaderStorageBuffer::Create(sizeof(triangles[0]) * triangles.size(), triangles.data(), GL_DYNAMIC_COPY, 2);
 
-	auto hemisphere_vectors = hemisphere_halton(1 << 14);
+	auto hemisphere_vectors = hemisphere_halton(1 << 8);
 	auto ray_vec3sSsbo = ShaderStorageBuffer::Create(
 		sizeof(hemisphere_vectors[0]) * hemisphere_vectors.size(), hemisphere_vectors.data(), GL_DYNAMIC_COPY, 3
 	);

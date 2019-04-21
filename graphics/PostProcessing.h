@@ -146,7 +146,7 @@ public:
 			frameBuffers_horizontal[i]->bind();
 			addProgram->clear();
 			addProgram->start();
-			glViewport(0, 0, width >> (i+1), height >> (i + 1));
+			glViewport(0, 0, width >> (i + 1), height >> (i + 1));
 			frameBuffers_vertical[i]->activate(0, 0);
 			((i == frameBuffers_horizontal.size() - 2) ? frameBuffers_vertical[i] : frameBuffers_horizontal[i + 1])->activate(0, 1);
 			postVertexArray->render();
