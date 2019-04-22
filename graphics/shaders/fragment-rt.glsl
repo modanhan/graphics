@@ -2,6 +2,7 @@
 #version 430
 #extension GL_ARB_shading_language_include : require
 #include "/shaders/math.glsl"
+#include "/shaders/brdf.glsl"
 #include "/shaders/rt-data.glsl"
 #include "/shaders/rt-algorithm.glsl"
 

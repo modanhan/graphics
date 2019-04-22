@@ -97,5 +97,8 @@
     <None Include="shaders\compute.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\brdf.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
