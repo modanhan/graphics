@@ -142,7 +142,7 @@ vec3 ray_trace1(vec3 position, vec3 direction) {
 	vec3 _rrv = _random(direction);
 	mat3 random_rotate = mat3(rotationMatrix(normal, _rrv.x + _rrv.y + _rrv.z));
 
-	int diffuse_count = int(ray_vec3s.length() * (1.0 - metallic)								/ 32 + 1); // downsample for secondary;
+	int diffuse_count = int(32 * (1.0 - metallic)							); // downsample for secondary;
 	for (int i = 0; i < diffuse_count; ++i) {
 		vec3 n_d = vec3(ray_vec3s[i]);
 
@@ -155,7 +155,7 @@ vec3 ray_trace1(vec3 position, vec3 direction) {
 			* dot(diffuse_d, normal)							* (1 - metallic) / diffuse_pdf; // diffuse
 	}
 
-	int specular_count = int(ray_vec3s.length() * pow(metallic, 1.0 / 3.0) * (1 - roughness)	/ 32 + 1); // downsample for secondary;
+	int specular_count = int(32 * pow(metallic, 1.0 / 3.0) * (1 - roughness)); // downsample for secondary;
 	for (int i = 0; i < specular_count; ++i) {
 		vec3 n_d = vec3(ray_vec3s[i]);
 
