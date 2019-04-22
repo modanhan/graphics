@@ -43,9 +43,9 @@ hit triangle_hit(triangle_data tri, vec3 origin, vec3 direction) {
 	return createHit(vec3(0), 1e+38);
 }
 
-float roughness = 0.15;
-float metallic = 0.98;
-vec3 F0 = vec3(0.97);
+float roughness = 0.18;
+float metallic = 0.99;
+vec3 F0 = vec3(0.98);
 
 float d_ggx(vec3 v, vec3 n)
 {
@@ -135,17 +135,15 @@ vec3 ray_trace1(vec3 position, vec3 direction) {
 	}
 
 	vec3 hit_position = position + direction * d;
-	vec3 intensity = d_emission;
-	float intensity_max = 0;
+	vec3 intensity = vec3(0);
 
 	mat3 normal_rotate = mat3(1);
 	normal_rotate = rotationMatrixFromTo(vec3(0, 1, 0), normal);
 	vec3 _rrv = _random(direction);
 	mat3 random_rotate = mat3(rotationMatrix(normal, _rrv.x + _rrv.y + _rrv.z));
 
-	for (int i = 0; i < 16; ++i) {
-		vec3 r_emission = vec3(0);
-
+	int diffuse_count = int(ray_vec3s.length() * (1.0 - metallic)								/ 32 + 1); // downsample for secondary;
+	for (int i = 0; i < diffuse_count; ++i) {
 		vec3 n_d = vec3(ray_vec3s[i]);
 
 		float is_angle = acos(n_d.y) / 3.1415926 * 0.5;
@@ -153,17 +151,23 @@ vec3 ray_trace1(vec3 position, vec3 direction) {
 		vec3 diffuse_d = random_rotate * normal_rotate * is_rotate * n_d;
 		float diffuse_pdf = cos(-asin(is_angle));
 		
+		intensity += ray_trace0(hit_position + normal * EPSILON, diffuse_d)
+			* dot(diffuse_d, normal)							* (1 - metallic) / diffuse_pdf; // diffuse
+	}
+
+	int specular_count = int(ray_vec3s.length() * pow(metallic, 1.0 / 3.0) * (1 - roughness)	/ 32 + 1); // downsample for secondary;
+	for (int i = 0; i < specular_count; ++i) {
+		vec3 n_d = vec3(ray_vec3s[i]);
+
 		// hacked importance sampling for specular, plz find source that remotely suggests this is correct
 		vec3 specular_d = normalize(mix(random_rotate * normal_rotate * n_d, reflect(direction, normal), 1 - roughness));
 		float specular_pdf = 1 / (roughness * roughness);
-
-		intensity += ray_trace0(hit_position + normal * EPSILON, diffuse_d)
-			* dot(diffuse_d, normal)							* (1 - metallic) / diffuse_pdf; // diffuse
+		
 		intensity += ray_trace0(hit_position + normal * EPSILON, specular_d)
 			* cook_torrance(-direction, normal, specular_d)		* (metallic) / specular_pdf; // specular
-		intensity_max += 1;
 	}
-	return d_emission + (intensity / intensity_max);
+
+	return d_emission + intensity / (diffuse_count + specular_count);
 }
 
 vec3 ray_trace2(vec3 position, vec3 direction) {
@@ -192,17 +196,15 @@ vec3 ray_trace2(vec3 position, vec3 direction) {
 	}
 
 	vec3 hit_position = position + direction * d;
-	vec3 intensity = d_emission;
-	float intensity_max = 0;
+	vec3 intensity = vec3(0);
 
 	mat3 normal_rotate = mat3(1);
 	normal_rotate = rotationMatrixFromTo(vec3(0, 1, 0), normal);
 	vec3 _rrv = _random(direction);
 	mat3 random_rotate = mat3(rotationMatrix(normal, _rrv.x + _rrv.y + _rrv.z));
 
-	for (int i = 0; i < ray_vec3s.length(); ++i) {
-		vec3 r_emission = vec3(0);
-
+	int diffuse_count = int(ray_vec3s.length() * (1.0 - metallic));
+	for (int i = 0; i < diffuse_count; ++i) {
 		vec3 n_d = vec3(ray_vec3s[i]);
 
 		float is_angle = acos(n_d.y) / 3.1415926 * 0.5;
@@ -210,15 +212,21 @@ vec3 ray_trace2(vec3 position, vec3 direction) {
 		vec3 diffuse_d = random_rotate * normal_rotate * is_rotate * n_d;
 		float diffuse_pdf = cos(-asin(is_angle));
 		
+		intensity += ray_trace1(hit_position + normal * EPSILON, diffuse_d)
+			* dot(diffuse_d, normal)							* (1 - metallic) / diffuse_pdf; // diffuse
+	}
+
+	int specular_count = int(ray_vec3s.length() * pow(metallic, 1.0 / 3.0) * (1 - roughness));
+	for (int i = 0; i < specular_count; ++i) {
+		vec3 n_d = vec3(ray_vec3s[i]);
+
 		// hacked importance sampling for specular, plz find source that remotely suggests this is correct
 		vec3 specular_d = normalize(mix(random_rotate * normal_rotate * n_d, reflect(direction, normal), 1 - roughness));
 		float specular_pdf = 1 / (roughness * roughness);
-
-		intensity += ray_trace1(hit_position + normal * EPSILON, diffuse_d)
-			* dot(diffuse_d, normal)							* (1 - metallic) / diffuse_pdf; // diffuse
+		
 		intensity += ray_trace1(hit_position + normal * EPSILON, specular_d)
 			* cook_torrance(-direction, normal, specular_d)		* (metallic) / specular_pdf; // specular
-		intensity_max += 1;
 	}
-	return d_emission + (intensity / intensity_max);
+
+	return d_emission + intensity / (diffuse_count + specular_count);
 }
